@@ -37,8 +37,7 @@ public class UserController {
 	
 	
 	@RequestMapping(path = "/login", method = RequestMethod.POST)
-	public ResponseEntity<?> login(@RequestParam("user") String email, @RequestParam("password")
-	String pwd) {
+	public ResponseEntity<?> login(@RequestParam String email, @RequestParam String pwd) {
 	UserEntity userEntity = userRepository.findByEmail(email);
 	if (userEntity != null && Encryption.validatePassword(pwd, userEntity.getPassword())) {
 	String token = getJWTToken(userEntity);
@@ -67,7 +66,7 @@ public class UserController {
 		}
 	
 	@Secured("ROLE_ADMIN")
-	@RequestMapping("/api/v1/users")
+	@RequestMapping("/test")
 	public ResponseEntity<?>getAllUsers(){
 		return new ResponseEntity<>(userRepository.findAll(),HttpStatus.OK);
 	}
