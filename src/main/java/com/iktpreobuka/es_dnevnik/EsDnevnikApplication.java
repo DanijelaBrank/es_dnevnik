@@ -16,7 +16,9 @@ import com.iktpreobuka.es_dnevnik.utils.Encryption;
 public class EsDnevnikApplication {
 	
 	
-	@Autowired UserRepository userRepository;
+	@Autowired 
+	private UserRepository userRepository;
+	
 	@Autowired
 	private RoleRepository roleRepository;
 
