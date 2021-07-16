@@ -15,7 +15,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	private final String HEADER = "Authorization";
@@ -30,7 +33,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		//try {
+		try {
 			if (checkJWTToken(request, response)) {
 				Claims claims = validateToken(request);
 				if (claims.get("authorities") != null) {
@@ -44,12 +47,12 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 			chain.doFilter(request, response);
 		}
 		
-	//	catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {
-	//		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-	//		((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
-	//		return;
-	//	}
-//	}
+		catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+			return;
+		}
+	}
 
 	private Claims validateToken(HttpServletRequest request) {
 		String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");

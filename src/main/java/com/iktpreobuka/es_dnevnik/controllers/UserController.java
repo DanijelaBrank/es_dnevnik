@@ -26,49 +26,46 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @RestController
 public class UserController {
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Value("${spring.security.secret-key}")
 	private String secretKey;
-	
+
 	@Value("${spring.security.token-duration}")
 	private Integer tokenDuration;
-	
-	
+
 	@RequestMapping(path = "/login", method = RequestMethod.POST)
-	public ResponseEntity<?> login(@RequestParam String email, @RequestParam String pwd) {
-	UserEntity userEntity = userRepository.findByEmail(email);
-	if (userEntity != null && Encryption.validatePassword(pwd, userEntity.getPassword())) {
-	String token = getJWTToken(userEntity);
-	UserTokenDTO user = new UserTokenDTO();
-	user.setUser(email);
-	user.setToken(token);
-	return new ResponseEntity<>(user, HttpStatus.OK);
-	}
-	return new ResponseEntity<>("Wrong credentials", HttpStatus.UNAUTHORIZED);
-	}
-	
-	//private String getJWTToken(UserEntity user) {
-	//	return null;
-	//	}
-	
-	private String getJWTToken(UserEntity userEntity) {
-		
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userEntity.getRole().getName());
-		String token = Jwts.builder().setId("softtekJWT").setSubject(userEntity.getEmail())
-		.claim("authorities", grantedAuthorities.stream()
-		.map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-		.setIssuedAt(new Date(System.currentTimeMillis()))
-		.setExpiration(new Date(System.currentTimeMillis() + tokenDuration))
-		.signWith(SignatureAlgorithm.HS512, this.secretKey.getBytes()).compact();
-		return "Bearer " + token;
+	public ResponseEntity<?> login(@RequestParam String userName, @RequestParam String pwd) {
+		UserEntity userEntity = userRepository.findByUserName(userName);
+		if (userEntity != null && Encryption.validatePassword(pwd, userEntity.getPassword())) {
+			String token = getJWTToken(userEntity);
+			UserTokenDTO user = new UserTokenDTO();
+			user.setUser(userName);
+			user.setToken(token);
+			return new ResponseEntity<>(user, HttpStatus.OK);
 		}
-	
+		return new ResponseEntity<>("Wrong credentials", HttpStatus.UNAUTHORIZED);
+	}
+
+	private String getJWTToken(UserEntity userEntity) {
+
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+				.commaSeparatedStringToAuthorityList(userEntity.getRole().getName());
+		String token = Jwts.builder().setId("softtekJWT").setSubject(userEntity.getUserName())
+				.claim("authorities",
+						grantedAuthorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+				.setIssuedAt(new Date(System.currentTimeMillis()))
+				.setExpiration(new Date(System.currentTimeMillis() + tokenDuration))
+				.signWith(SignatureAlgorithm.HS512, this.secretKey.getBytes()).compact();
+		return "Bearer " + token;
+	}
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping("/test")
-	public ResponseEntity<?>getAllUsers(){
-		return new ResponseEntity<>(userRepository.findAll(),HttpStatus.OK);
+	public ResponseEntity<?> getAllUsers() {
+		return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
 	}
 
 }

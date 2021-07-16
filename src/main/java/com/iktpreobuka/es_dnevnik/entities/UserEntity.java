@@ -42,7 +42,7 @@ public class UserEntity {
 	private String name;
 	
 	@Column(name = "last_name")
-	private String lastname;
+	private String lastName;
 	
 	@ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.LAZY)
 	@JoinColumn(name="address")
@@ -62,6 +62,17 @@ public class UserEntity {
 	public UserEntity() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+
+	public UserEntity(String email, String userName, String password, String name, String lastName, RoleEntity role) {
+		super();
+		this.email = email;
+		this.userName = userName;
+		this.password = password;
+		this.name = name;
+		this.lastName = lastName;
+		this.role=role;
 	}
 
 
@@ -115,13 +126,13 @@ public class UserEntity {
 	}
 
 
-	public String getLastname() {
-		return lastname;
+	public String getLastName() {
+		return lastName;
 	}
 
 
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 

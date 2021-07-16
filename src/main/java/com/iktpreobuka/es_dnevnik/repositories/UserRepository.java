@@ -9,6 +9,8 @@ public interface UserRepository extends CrudRepository <UserEntity,Integer>{
 	public UserEntity findByEmail(String email);
 	
 	public UserEntity findByUserName(String userName);
+
+	public boolean existsByUserName(String userName);
 	
 
 }
