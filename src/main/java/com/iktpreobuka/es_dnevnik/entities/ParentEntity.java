@@ -8,8 +8,10 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
+@JsonIgnoreProperties({ "handler", "hibernateLazyInitializer" })
 public class ParentEntity extends UserEntity {
 	
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)

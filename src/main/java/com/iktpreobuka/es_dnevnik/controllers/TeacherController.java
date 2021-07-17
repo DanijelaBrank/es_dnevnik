@@ -47,7 +47,7 @@ public class TeacherController {
 
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST,path = "/addTeacher/{group}")
-	public ResponseEntity<?> addTeacher(@PathVariable EClassGroup group, @Valid @RequestBody UserDTO newUser, BindingResult result) {
+	public ResponseEntity<?> addTeacher(@Valid @PathVariable EClassGroup group, @Valid @RequestBody UserDTO newUser, BindingResult result) {
 	if (result.hasErrors()) {
 	return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 	} 

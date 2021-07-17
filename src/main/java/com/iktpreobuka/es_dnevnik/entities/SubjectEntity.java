@@ -12,8 +12,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
+@JsonIgnoreProperties({ "handler", "hibernateLazyInitializer" })
 public class SubjectEntity {
 	
 	@Id
@@ -31,9 +33,9 @@ public class SubjectEntity {
 	@JsonIgnore
 	private List<TeacherSubjectEntity> subjectTeacher;
 	
-	@OneToMany(mappedBy = "subjectLev", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "subjectGrade", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<SubjectInLevelEntity> subjectsLev;
+	private List<SubjectInGradeEntity> subjectsInGrade;
 
 	public Integer getId() {
 		return id;
@@ -67,12 +69,14 @@ public class SubjectEntity {
 		this.subjectTeacher = subjectTeacher;
 	}
 
-	public List<SubjectInLevelEntity> getSubjectsLev() {
-		return subjectsLev;
+	
+
+	public List<SubjectInGradeEntity> getSubjectsInGrade() {
+		return subjectsInGrade;
 	}
 
-	public void setSubjectsLev(List<SubjectInLevelEntity> subjectsLev) {
-		this.subjectsLev = subjectsLev;
+	public void setSubjectsInGrade(List<SubjectInGradeEntity> subjectsInGrade) {
+		this.subjectsInGrade = subjectsInGrade;
 	}
 
 	public SubjectEntity() {

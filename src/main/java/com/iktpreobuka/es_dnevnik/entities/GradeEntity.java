@@ -31,7 +31,7 @@ public class GradeEntity {
 	
 	@OneToMany(mappedBy = "gradeSab", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<SubjectInLevelEntity>subjectsInLevel;
+	private List<SubjectInGradeEntity>subjectsInLevel;
 
 	public GradeEntity() {
 		super();
@@ -70,11 +70,11 @@ public class GradeEntity {
 		this.classes = classes;
 	}
 
-	public List<SubjectInLevelEntity> getSubjectsInLevel() {
+	public List<SubjectInGradeEntity> getSubjectsInLevel() {
 		return subjectsInLevel;
 	}
 
-	public void setSubjectsInLevel(List<SubjectInLevelEntity> subjectsInLevel) {
+	public void setSubjectsInLevel(List<SubjectInGradeEntity> subjectsInLevel) {
 		this.subjectsInLevel = subjectsInLevel;
 	}
 	
