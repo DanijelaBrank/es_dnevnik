@@ -32,7 +32,7 @@ public class AdminController {
 
 	@Autowired
 	private RoleRepository roleRepository;
-
+		
 	@Autowired
 	UserCustomValidator userValidator;
 
@@ -66,10 +66,5 @@ public class AdminController {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
 	}
 	
-	@Secured("ROLE_ADMIN")
-	@RequestMapping(method = RequestMethod.POST, path = "/createGradebook")
-	private String createGradeBook() {
-		return "Gradebook successfully created! ";
-	}
 
 }

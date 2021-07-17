@@ -30,52 +30,51 @@ import com.iktpreobuka.es_dnevnik.utils.UserCustomValidator;
 
 @RestController
 public class StudentController {
-	
+
 	@Autowired
 	private StudentRepository studentRepository;
-	
+
 	@Autowired
 	private RoleRepository roleRepository;
-	
-	@Autowired 
+
+	@Autowired
 	private UserRepository userRepository;
-	
-	@Autowired 
+
+	@Autowired
 	private ParentRepository parentRepository;
-	
+
 	@Autowired
 	UserCustomValidator userValidator;
-	
+
 	@InitBinder
-	protected void initBinder(final WebDataBinder binder)
-	{
-	binder.addValidators(userValidator);
+	protected void initBinder(final WebDataBinder binder) {
+		binder.addValidators(userValidator);
 	}
 
 	@Secured("ROLE_ADMIN")
-	@RequestMapping(method = RequestMethod.POST,path = "/addStudent")
+	@RequestMapping(method = RequestMethod.POST, path = "/addStudent")
 	public ResponseEntity<?> addStudent(@Valid @RequestBody UserDTO newUser, BindingResult result) {
-	if (result.hasErrors()) {
-	return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-	} 
-	else {
-	userValidator.validate(newUser, result);
-	
+		if (result.hasErrors()) {
+			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
+		} else {
+			userValidator.validate(newUser, result);
+
+		}
+		StudentEntity student = new StudentEntity();
+		student.setName(newUser.getName());
+		student.setLastName(newUser.getLastName());
+		student.setUserName(newUser.getUserName());
+		student.setEmail(newUser.getEmail());
+		student.setPassword(Encryption.getPassEncoded(newUser.getPassword()));
+		student.setRole(roleRepository.findById(4).get());
+		studentRepository.save(student);
+		return new ResponseEntity<>(student, HttpStatus.OK);
 	}
-	StudentEntity student = new StudentEntity();
-	student.setName(newUser.getName());
-	student.setLastName(newUser.getLastName());
-	student.setUserName(newUser.getUserName());
-	student.setEmail(newUser.getEmail());
-	student.setPassword(Encryption.getPassEncoded(newUser.getPassword()));
-	student.setRole(roleRepository.findById(4).get());
-	studentRepository.save(student);
-	return new ResponseEntity<>(student, HttpStatus.OK);
-	}
-	
+
 	@Secured("ROLE_ADMIN")
-	@RequestMapping(method = RequestMethod.PUT,path ="/addParentToStudent")
-	public ResponseEntity<?> addParentToStudent(@RequestParam String studentUserName, @RequestParam String parentUserName) {
+	@RequestMapping(method = RequestMethod.PUT, path = "/addParentToStudent")
+	public ResponseEntity<?> addParentToStudent(@RequestParam String studentUserName,
+			@RequestParam String parentUserName) {
 //	if (result.hasErrors()) {
 //	return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 //	} 
@@ -83,23 +82,22 @@ public class StudentController {
 //	userValidator.validate(newUser, result);
 //	
 //	}
-		
-	if(!userRepository.existsByUserName(studentUserName))	
-		return new ResponseEntity<>("Student don't exists", HttpStatus.BAD_REQUEST);
-	
-	if(!userRepository.existsByUserName(parentUserName))	
-		return new ResponseEntity<>("Parent don't exists", HttpStatus.BAD_REQUEST);
-	
-	StudentEntity student = studentRepository.findByUserName(studentUserName);
-	ParentEntity parent=parentRepository.findByUserName(parentUserName);
-	
-	
-	student.setParent(parent);    
-	studentRepository.save(student);
-	return new ResponseEntity<>(student, HttpStatus.OK);
+		if (!userRepository.existsByUserName(studentUserName))
+			return new ResponseEntity<>("Student don't exists", HttpStatus.BAD_REQUEST);
+
+		if (!userRepository.existsByUserName(parentUserName))
+			return new ResponseEntity<>("Parent don't exists", HttpStatus.BAD_REQUEST);
+
+		StudentEntity student = studentRepository.findByUserName(studentUserName);
+		ParentEntity parent = parentRepository.findByUserName(parentUserName);
+
+		student.setParent(parent);
+		studentRepository.save(student);
+		return new ResponseEntity<>(student, HttpStatus.OK);
 	}
+
 	private String createErrorMessage(BindingResult result) {
-	return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
-	
+		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
+
 	}
 }
