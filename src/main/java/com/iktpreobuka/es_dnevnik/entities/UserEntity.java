@@ -11,7 +11,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -44,7 +43,7 @@ public class UserEntity {
 	@Column(name = "last_name")
 	private String lastName;
 	
-	@ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.LAZY)
+	@ManyToOne(cascade=CascadeType.REFRESH  , fetch=FetchType.LAZY)
 	@JoinColumn(name="address")
 	private AddressEntity address;
 	
