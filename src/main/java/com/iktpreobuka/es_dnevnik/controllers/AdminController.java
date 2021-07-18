@@ -21,6 +21,7 @@ import com.iktpreobuka.es_dnevnik.entities.UserEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.UserDTO;
 import com.iktpreobuka.es_dnevnik.repositories.RoleRepository;
 import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
+import com.iktpreobuka.es_dnevnik.services.UserService;
 import com.iktpreobuka.es_dnevnik.utils.Encryption;
 import com.iktpreobuka.es_dnevnik.utils.UserCustomValidator;
 
@@ -32,6 +33,9 @@ public class AdminController {
 
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	@Autowired
+	private UserService userService;
 		
 	@Autowired
 	UserCustomValidator userValidator;
@@ -41,25 +45,18 @@ public class AdminController {
 		binder.addValidators(userValidator);
 	}
 
+//  ****** DODAVANJE ADMINISTRATORA  *********
+	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST, path = "/addAdmin")
 	public ResponseEntity<?> addAdmin(@Valid @RequestBody UserDTO newUser, BindingResult result) {
-		if (result.hasErrors()) {
+		if (result.hasErrors())
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-		} else {
-			userValidator.validate(newUser, result);
-
-		}
-		UserEntity user = new UserEntity();
-		user.setName(newUser.getName());
-		user.setLastName(newUser.getLastName());
-		user.setUserName(newUser.getUserName());
-		user.setEmail(newUser.getEmail());
-		user.setPassword(Encryption.getPassEncoded(newUser.getPassword()));
-		// RoleEntity role = roleRepository.findById(1).get();
+		userValidator.validate(newUser, result);
+		UserEntity user=userService.addUser(newUser);
 		user.setRole(roleRepository.findById(1).get());
 		userRepository.save(user);
-		return new ResponseEntity<>(user, HttpStatus.OK);
+		return new ResponseEntity<>(user, HttpStatus.OK);		
 	}
 
 	private String createErrorMessage(BindingResult result) {

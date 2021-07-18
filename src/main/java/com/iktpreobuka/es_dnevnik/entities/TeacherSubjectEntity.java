@@ -12,7 +12,7 @@ import javax.persistence.OneToOne;
 
 @Entity
 public class TeacherSubjectEntity {
-	
+		
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name = "ts_id")
@@ -28,4 +28,43 @@ public class TeacherSubjectEntity {
 	
 	@OneToOne(mappedBy="teacherSubject",cascade=CascadeType.REFRESH, fetch=FetchType.LAZY)
 	private TeachingEntity teaching;
+	
+	public TeacherSubjectEntity() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public TeacherEntity getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(TeacherEntity teacher) {
+		this.teacher = teacher;
+	}
+
+	public SubjectEntity getSubject() {
+		return subject;
+	}
+
+	public void setSubject(SubjectEntity subject) {
+		this.subject = subject;
+	}
+
+	public TeachingEntity getTeaching() {
+		return teaching;
+	}
+
+	public void setTeaching(TeachingEntity teaching) {
+		this.teaching = teaching;
+	}
+
+	
 }

@@ -41,6 +41,9 @@ public class ParentController {
 	binder.addValidators(userValidator);
 	}
 
+	
+//  ****** DODAVANJE RODITELJA  *********
+	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST,path = "/addParent")
 	public ResponseEntity<?> addParent(@Valid @RequestBody UserDTO newUser, BindingResult result) {

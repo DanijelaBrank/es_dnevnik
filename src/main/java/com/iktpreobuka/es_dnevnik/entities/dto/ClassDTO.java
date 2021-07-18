@@ -5,21 +5,21 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import com.iktpreobuka.es_dnevnik.entities.EClassGroup;
-
-public class GradeDTO {
+public class ClassDTO {
 	
 	@NotNull(message = "Grade must be provided.")
 	@Min(value = 1, message = "Grade must be between 1 - 8")
 	@Max(value = 8, message = "Grade must be between 1 - 8")
-	@Column(nullable = false, unique = true)
-	private Integer grade;
-
-//	@NotBlank(message = "Class group must have value JUNIOR_CLASS or SENIOR_CLASS")
 	@Column(nullable = false)
-	private EClassGroup classGroup;
+	private Integer grade;
+	
+	@NotNull(message = "Sign of class must be provided.")
+	@Min(value = 1, message = "Sign of class must be between 1 - 10")
+	@Max(value = 10, message = "Sign of class must be between 1 - 10")
+	@Column(nullable = false)
+	private Integer sign;
 
-	public GradeDTO() {
+	public ClassDTO() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -32,12 +32,12 @@ public class GradeDTO {
 		this.grade = grade;
 	}
 
-	public EClassGroup getClassGroup() {
-		return classGroup;
+	public Integer getSign() {
+		return sign;
 	}
 
-	public void setClassGroup(EClassGroup classGroup) {
-		this.classGroup = classGroup;
+	public void setSign(Integer sign) {
+		this.sign = sign;
 	}
 	
 	
