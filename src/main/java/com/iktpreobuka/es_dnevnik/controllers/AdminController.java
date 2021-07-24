@@ -22,7 +22,6 @@ import com.iktpreobuka.es_dnevnik.entities.dto.UserDTO;
 import com.iktpreobuka.es_dnevnik.repositories.RoleRepository;
 import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
 import com.iktpreobuka.es_dnevnik.services.UserService;
-import com.iktpreobuka.es_dnevnik.utils.Encryption;
 import com.iktpreobuka.es_dnevnik.utils.UserCustomValidator;
 
 @RestController
@@ -54,7 +53,7 @@ public class AdminController {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		userValidator.validate(newUser, result);
 		UserEntity user=userService.addUser(newUser);
-		user.setRole(roleRepository.findById(1).get());
+		user.setRole(roleRepository.findById(1));
 		userRepository.save(user);
 		return new ResponseEntity<>(user, HttpStatus.OK);		
 	}

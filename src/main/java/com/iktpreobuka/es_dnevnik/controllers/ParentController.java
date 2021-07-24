@@ -60,7 +60,7 @@ public class ParentController {
 	parent.setUserName(newUser.getUserName());
 	parent.setEmail(newUser.getEmail());
 	parent.setPassword(Encryption.getPassEncoded(newUser.getPassword()));
-	parent.setRole(roleRepository.findById(3).get());
+	parent.setRole(roleRepository.findById(3));
 	parentRepository.save(parent);
 	return new ResponseEntity<>(parent, HttpStatus.OK);
 	}

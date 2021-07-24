@@ -21,14 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iktpreobuka.es_dnevnik.entities.ClassEntity;
 import com.iktpreobuka.es_dnevnik.entities.ParentEntity;
 import com.iktpreobuka.es_dnevnik.entities.StudentEntity;
-import com.iktpreobuka.es_dnevnik.entities.UserEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.UserDTO;
 import com.iktpreobuka.es_dnevnik.repositories.ClassRepository;
 import com.iktpreobuka.es_dnevnik.repositories.ParentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.RoleRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
-import com.iktpreobuka.es_dnevnik.services.UserService;
 import com.iktpreobuka.es_dnevnik.utils.Encryption;
 import com.iktpreobuka.es_dnevnik.utils.UserCustomValidator;
 
@@ -76,7 +74,7 @@ public class StudentController {
 		student.setUserName(newUser.getUserName());
 		student.setEmail(newUser.getEmail());
 		student.setPassword(Encryption.getPassEncoded(newUser.getPassword()));
-		student.setRole(roleRepository.findById(4).get());
+		student.setRole(roleRepository.findById(4));
 		studentRepository.save(student);
 		return new ResponseEntity<>(student, HttpStatus.OK);
 	}

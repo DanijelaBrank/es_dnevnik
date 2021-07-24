@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktpreobuka.es_dnevnik.entities.UserEntity;
+//import com.iktpreobuka.es_dnevnik.entities.UserEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.UserTokenDTO;
 import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
 import com.iktpreobuka.es_dnevnik.utils.Encryption;
@@ -51,8 +52,10 @@ public class UserController {
 
 	private String getJWTToken(UserEntity userEntity) {
 
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-				.commaSeparatedStringToAuthorityList(userEntity.getRole().getName());
+//		List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+//				.commaSeparatedStringToAuthorityList(userEntity.getRole().getName);
+		
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userEntity.getRole().getName());
 		String token = Jwts.builder().setId("softtekJWT").setSubject(userEntity.getUserName())
 				.claim("authorities",
 						grantedAuthorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))

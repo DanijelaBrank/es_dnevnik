@@ -1,6 +1,7 @@
 package com.iktpreobuka.es_dnevnik.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
@@ -11,7 +12,7 @@ import com.iktpreobuka.es_dnevnik.repositories.TeacherRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeacherSubjectRepository;
 
 
-
+@Service
 public class TeacherServiceImpl implements TeacherService {
 	
 	@Autowired

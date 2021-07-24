@@ -16,9 +16,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktpreobuka.es_dnevnik.entities.ClassEntity;
+import com.iktpreobuka.es_dnevnik.entities.TeacherSubjectEntity;
+import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.ClassDTO;
+import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectClassDTO;
+import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectDTO;
 import com.iktpreobuka.es_dnevnik.repositories.ClassRepository;
 import com.iktpreobuka.es_dnevnik.repositories.GradeRepository;
+import com.iktpreobuka.es_dnevnik.services.ClassService;
 
 @RestController
 public class ClassController {
@@ -28,7 +33,9 @@ public class ClassController {
 	
 	@Autowired
 	private GradeRepository gradeRepository;
-
+	
+	@Autowired
+	private ClassService classService;
 
 //  ****** DODAVANJE ODELJENJA  *********	
 	@Secured("ROLE_ADMIN")
@@ -42,6 +49,21 @@ public class ClassController {
 		clazz.setSign(newClass.getSign());
 		classRepository.save(clazz);
 		return new ResponseEntity<>(clazz, HttpStatus.OK);
+	}
+	
+//  ******* DODAVANJE PREDMETA SA NASTAVNIKOM ODELJENJU  *******
+	
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.POST, path = "/addSubjectTeacherToClass")
+	public ResponseEntity<?> addSubjectWithTeacherToClass(@Valid @RequestBody TeacherSubjectClassDTO newSubjectTeacherToClass,BindingResult result) {
+		if (result.hasErrors())
+			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
+		
+		TeachingEntity teachingToClass = classService.addTeachingToClass(newSubjectTeacherToClass);
+		if (teachingToClass == null)
+			return new ResponseEntity<>("Subject or teacher or class doesn't exist or doesn't match.",
+					HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(teachingToClass, HttpStatus.OK);
 	}
 	
 	private String createErrorMessage(BindingResult result) {

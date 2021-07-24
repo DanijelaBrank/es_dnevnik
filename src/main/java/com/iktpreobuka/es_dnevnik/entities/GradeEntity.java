@@ -27,6 +27,8 @@ public class GradeEntity {
 	
 	private EClassGroup classGroup;
 	
+	private Integer semester; 
+	
 	@OneToMany(mappedBy = "classInGrade", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<ClassEntity> classes;
@@ -62,8 +64,17 @@ public class GradeEntity {
 
 	public void setClassGroup(EClassGroup classGroup) {
 		this.classGroup = classGroup;
+		
+		}
+
+	public Integer getSemester() {
+		return semester;
 	}
 
+	public void setSemester(Integer semester) {
+		this.semester = semester;
+	}
+	
 	public List<ClassEntity> getClasses() {
 		return classes;
 	}

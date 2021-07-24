@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class TeachingEntity {
 	
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name = "t_id")
@@ -36,6 +37,44 @@ public class TeachingEntity {
 	@OneToMany(mappedBy = "grader", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<MarkEntity> marksGrader;
+	
+	public TeachingEntity() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public TeacherSubjectEntity getTeacherSubject() {
+		return teacherSubject;
+	}
+
+	public void setTeacherSubject(TeacherSubjectEntity teacherSubject) {
+		this.teacherSubject = teacherSubject;
+	}
+
+	public ClassEntity getTeachToClass() {
+		return teachToClass;
+	}
+
+	public void setTeachToClass(ClassEntity teachToClass) {
+		this.teachToClass = teachToClass;
+	}
+
+	public List<MarkEntity> getMarksGrader() {
+		return marksGrader;
+	}
+
+	public void setMarksGrader(List<MarkEntity> marksGrader) {
+		this.marksGrader = marksGrader;
+	}
+	
 	
 
 }
