@@ -8,6 +8,7 @@ import com.iktpreobuka.es_dnevnik.entities.TeacherSubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectClassDTO;
 import com.iktpreobuka.es_dnevnik.repositories.ClassRepository;
+import com.iktpreobuka.es_dnevnik.repositories.SubjectInGradeRepository;
 import com.iktpreobuka.es_dnevnik.repositories.SubjectRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeacherRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeacherSubjectRepository;
@@ -27,6 +28,9 @@ public class ClassServiceImpl implements ClassService {
 	
 	@Autowired
 	private TeachingRepository teachingRepository;
+	
+	@Autowired
+	private SubjectInGradeRepository subjectInGradeRepository;
 
 	@Override
 	public TeachingEntity addTeachingToClass(TeacherSubjectClassDTO newSubjectTeacherToClass) {
@@ -39,6 +43,9 @@ public class ClassServiceImpl implements ClassService {
 				newSubjectTeacherToClass.getSign()))     
 			return null;
 		
+		if (!subjectInGradeRepository.existsBySubjectGradeNameAndGradeSabGrade(newSubjectTeacherToClass.getSubject(),
+				newSubjectTeacherToClass.getGrade()))     
+			return null;
 		
 		TeacherSubjectEntity tsAdd=teacherSubjectRepository.findByTeacherUserNameAndSubjectNameAndSubjectClassGroup(newSubjectTeacherToClass.getUserName(),
 				newSubjectTeacherToClass.getSubject(),newSubjectTeacherToClass.getClassGroup());

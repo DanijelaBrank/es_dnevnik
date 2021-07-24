@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 @Entity
 public class MarkEntity {
 	
@@ -24,7 +26,7 @@ public class MarkEntity {
 	
 	private Integer mark;
 	
-	private String semestar;
+	private Integer semester;
 	
 	private LocalDate date;
 	
@@ -59,12 +61,12 @@ public class MarkEntity {
 		this.mark = mark;
 	}
 
-	public String getSemestar() {
-		return semestar;
+	public Integer getSemester() {
+		return semester;
 	}
 
-	public void setSemestar(String semestar) {
-		this.semestar = semestar;
+	public void setSemester(Integer semester) {
+		this.semester = semester;
 	}
 
 	public LocalDate getDate() {

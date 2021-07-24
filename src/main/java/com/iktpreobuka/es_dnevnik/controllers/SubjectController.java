@@ -38,10 +38,6 @@ public class SubjectController {
 	if (result.hasErrors()) {
 	return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 	} 
-//	else {
-//	userValidator.validate(newUser, result);
-//	
-//	}
 	SubjectEntity subject = new SubjectEntity();
 	subject.setName(newSubject.getName());
 	subject.setClassGroup(newSubject.getClassGroup());

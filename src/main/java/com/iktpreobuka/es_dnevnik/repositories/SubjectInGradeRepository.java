@@ -6,4 +6,6 @@ import com.iktpreobuka.es_dnevnik.entities.SubjectInGradeEntity;
 
 public interface SubjectInGradeRepository extends CrudRepository<SubjectInGradeEntity, Integer> {
 
+	boolean existsBySubjectGradeNameAndGradeSabGrade(String subject, Integer grade);
+
 }
