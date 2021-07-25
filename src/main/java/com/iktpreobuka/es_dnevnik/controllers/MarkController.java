@@ -21,6 +21,8 @@ import com.iktpreobuka.es_dnevnik.entities.dto.MarkDTO;
 import com.iktpreobuka.es_dnevnik.repositories.MarkRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeachingRepository;
+import com.iktpreobuka.es_dnevnik.services.ClassService;
+import com.iktpreobuka.es_dnevnik.services.UserService;
 
 @RestController
 public class MarkController {
@@ -34,6 +36,9 @@ public class MarkController {
 	@Autowired
 	private MarkRepository markRepository;
 	
+	@Autowired
+	private UserService userService;
+	
 //  ******* OCENJIVANJE UCENIKA  *******
 	
 	@Secured("ROLE_TEACHER")
@@ -45,12 +50,12 @@ public class MarkController {
 		if (!studentRepository.existsByUserName(newMark.getStudentUserName()))
 			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);
 		
-		if(!teachingRepository.existsByTeacherSubjectSubjectName(newMark.getSubject()))
+		if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()))
 			return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
 		
 		MarkEntity mark=new MarkEntity();
 				mark.setStudent(studentRepository.findByUserName(newMark.getStudentUserName()));
-				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()));
+				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()));
 				mark.setMark(newMark.getMark());
 				mark.setDescription(newMark.getDescription());
 				if(newMark.getDate()!=null)
@@ -66,7 +71,7 @@ public class MarkController {
 //  ******* DAVANJE OCENA UCENIKU OD STRANE ADMINISTRATORA *******
 	
 	@Secured("ROLE_ADMIN")
-	@RequestMapping(method = RequestMethod.POST, path = "/addMarByAdmin")
+	@RequestMapping(method = RequestMethod.POST, path = "/addMarkByAdmin")
 	public ResponseEntity<?> addMarkByAdmin(@Valid @RequestBody MarkDTO newMark, BindingResult result) {
 		if (result.hasErrors()) 
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST); 

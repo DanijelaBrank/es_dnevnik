@@ -14,11 +14,11 @@ import javax.persistence.ManyToOne;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 public class MarkEntity {
-	
-	
-
+		
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name = "mark_id")

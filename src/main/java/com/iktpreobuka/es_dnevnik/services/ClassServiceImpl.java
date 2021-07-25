@@ -31,7 +31,7 @@ public class ClassServiceImpl implements ClassService {
 	
 	@Autowired
 	private SubjectInGradeRepository subjectInGradeRepository;
-
+	
 	@Override
 	public TeachingEntity addTeachingToClass(TeacherSubjectClassDTO newSubjectTeacherToClass) {
 

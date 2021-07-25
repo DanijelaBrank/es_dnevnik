@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @RestController
 public class UserController {
+	
+	private final Logger logger=LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private UserRepository userRepository;
@@ -45,8 +49,10 @@ public class UserController {
 			UserTokenDTO user = new UserTokenDTO();
 			user.setUser(userName);
 			user.setToken(token);
+			logger.info("Successful login!");
 			return new ResponseEntity<>(user, HttpStatus.OK);
 		}
+		logger.info("Wrong login credentials!");
 		return new ResponseEntity<>("Wrong credentials", HttpStatus.UNAUTHORIZED);
 	}
 

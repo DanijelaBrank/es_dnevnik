@@ -10,4 +10,8 @@ public interface TeachingRepository extends CrudRepository<TeachingEntity, Integ
 
 	boolean existsByTeacherSubjectSubjectName(String subject);
 
+	boolean existsByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(String subject, String loggedUser);
+
+	TeachingEntity findByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(String subject, String loggedUser);
+
 }

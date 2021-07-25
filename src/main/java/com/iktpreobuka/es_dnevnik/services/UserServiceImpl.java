@@ -1,5 +1,7 @@
 package com.iktpreobuka.es_dnevnik.services;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.iktpreobuka.es_dnevnik.entities.UserEntity;
@@ -20,6 +22,13 @@ public class UserServiceImpl implements UserService {
 		user.setEmail(newUser.getEmail());
 		user.setPassword(Encryption.getPassEncoded(newUser.getPassword()));
 		return user;
+	}
+	
+	@Override
+	public String getLoggedUser() {
+		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+		String currentUserName=authentication.getName();
+		return currentUserName;
 	}
 
 }

@@ -6,5 +6,6 @@ import com.iktpreobuka.es_dnevnik.entities.dto.UserDTO;
 public interface UserService {
 	
 	public UserEntity addUser(UserDTO newUser);
+	public String getLoggedUser();
 
 }
