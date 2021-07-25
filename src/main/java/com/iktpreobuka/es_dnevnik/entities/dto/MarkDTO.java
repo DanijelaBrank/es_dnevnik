@@ -10,34 +10,28 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Range;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.iktpreobuka.es_dnevnik.entities.EClassGroup;
 
 public class MarkDTO {
-	
+
 	@NotBlank(message = "Username must be not blank or null.")
 	@Size(min = 5, max = 15, message = "Username must be between {min} and {max} characters long.")
 	@Column(nullable = false)
 	private String studentUserName;
-	
-	@Column(nullable = false)
-	private EClassGroup classGroup;
-	
+
 	@NotBlank(message = "Subject name must be not blank or null.")
 	@Size(min = 2, max = 30, message = "Subject name lenght must be string between {min} and {max}.")
 	@Column(nullable = false)
 	private String subject;
-	
-	
-	
+
 	@NotNull(message = "Mark must be provided.")
-	@Range(min = 1,max=5, message = "Mark must be between 1 - 5")
+	@Range(min = 1, max = 5, message = "Mark must be between 1 - 5")
 	@Column(nullable = false)
 	private Integer mark;
-	
-	@JsonFormat(shape=JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy")
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	@Column(nullable = true)
 	private LocalDate date;
-	
+
 	@NotBlank(message = "Description must be not blank or null.")
 	@Size(min = 2, max = 30, message = "Description lenght must be string between {min} and {max}.")
 	@Column(nullable = false)
@@ -47,7 +41,7 @@ public class MarkDTO {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public String getStudentUserName() {
 		return studentUserName;
 	}
@@ -87,7 +81,5 @@ public class MarkDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
 
 }
