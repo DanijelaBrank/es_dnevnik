@@ -11,6 +11,8 @@ public interface TeacherRepository extends CrudRepository <TeacherEntity,Integer
 
 	TeacherEntity findByUserNameAndClassGroup(String userName, EClassGroup classGroup);
 
+	TeacherEntity findByUserName(String userName);
+
 	
 
 }

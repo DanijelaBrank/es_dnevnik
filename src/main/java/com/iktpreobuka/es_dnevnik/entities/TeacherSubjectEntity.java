@@ -10,7 +10,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
+@JsonIgnoreProperties({ "handler", "hibernateLazyInitializer" })
 public class TeacherSubjectEntity {
 		
 	@Id
@@ -27,6 +31,7 @@ public class TeacherSubjectEntity {
 	private SubjectEntity subject;
 	
 	@OneToOne(mappedBy="teacherSubject",cascade=CascadeType.REFRESH, fetch=FetchType.LAZY)
+	@JsonIgnore
 	private TeachingEntity teaching;
 	
 	public TeacherSubjectEntity() {

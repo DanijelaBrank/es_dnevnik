@@ -8,7 +8,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Range;
-import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.iktpreobuka.es_dnevnik.entities.EClassGroup;
 
 public class MarkDTO {
 	
@@ -17,17 +19,22 @@ public class MarkDTO {
 	@Column(nullable = false)
 	private String studentUserName;
 	
+	@Column(nullable = false)
+	private EClassGroup classGroup;
+	
 	@NotBlank(message = "Subject name must be not blank or null.")
 	@Size(min = 2, max = 30, message = "Subject name lenght must be string between {min} and {max}.")
 	@Column(nullable = false)
 	private String subject;
+	
+	
 	
 	@NotNull(message = "Mark must be provided.")
 	@Range(min = 1,max=5, message = "Mark must be between 1 - 5")
 	@Column(nullable = false)
 	private Integer mark;
 	
-	@DateTimeFormat(pattern = "dd-MMM-yyyy")
+	@JsonFormat(shape=JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy")
 	@Column(nullable = true)
 	private LocalDate date;
 	

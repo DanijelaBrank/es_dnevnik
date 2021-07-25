@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +19,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktpreobuka.es_dnevnik.entities.MarkEntity;
+import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
+import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
+import com.iktpreobuka.es_dnevnik.entities.UserEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.MarkDTO;
 import com.iktpreobuka.es_dnevnik.repositories.MarkRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
+import com.iktpreobuka.es_dnevnik.repositories.SubjectRepository;
+import com.iktpreobuka.es_dnevnik.repositories.TeacherRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeachingRepository;
+import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
 import com.iktpreobuka.es_dnevnik.services.ClassService;
 import com.iktpreobuka.es_dnevnik.services.UserService;
 
 @RestController
 public class MarkController {
 	
+	private final Logger logger=LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired
+	private TeacherRepository teacherRepository;
 	@Autowired
 	private StudentRepository studentRepository;
 	
@@ -35,6 +47,9 @@ public class MarkController {
 	
 	@Autowired
 	private MarkRepository markRepository;
+	
+	@Autowired
+	private SubjectRepository subjectRepository;
 	
 	@Autowired
 	private UserService userService;
@@ -46,16 +61,28 @@ public class MarkController {
 	public ResponseEntity<?> addMarkToStudent(@Valid @RequestBody MarkDTO newMark, BindingResult result) {
 		if (result.hasErrors()) 
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST); 
+	
+		TeacherEntity logTeacher=teacherRepository.findByUserName(userService.getLoggedUser());
+		SubjectEntity sub=subjectRepository.findByNameAndClassGroup(newMark.getSubject(),logTeacher.getClassGroup());
 
-		if (!studentRepository.existsByUserName(newMark.getStudentUserName()))
-			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);
+		if (!studentRepository.existsByUserName(newMark.getStudentUserName())) {
+			logger.info("Student doesn't exists!");
+			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);}
+		if(!teachingRepository.existsByTeacherSubjectSubjectAndTeacherSubjectTeacher(sub,logTeacher)) {
+			logger.info("Student doesn't attend that subject!");
 		
-		if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()))
-			return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);}
 		
+	//	if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()))
+	//		return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);.
+	
+		//	if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectSubjectClassGroupAndTeacherSubjectTeacherUserName(newMark.getSubject(),0,userService.getLoggedUser()))
+	//		return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
+		
+
 		MarkEntity mark=new MarkEntity();
 				mark.setStudent(studentRepository.findByUserName(newMark.getStudentUserName()));
-				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()));
+				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectAndTeacherSubjectTeacher(sub,logTeacher));
 				mark.setMark(newMark.getMark());
 				mark.setDescription(newMark.getDescription());
 				if(newMark.getDate()!=null)
@@ -63,11 +90,41 @@ public class MarkController {
 					else
 						mark.setDate(LocalDate.now());
 				mark.setSemester(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()).getTeachToClass().getClassInGrade().getSemester());
-				markRepository.save(mark);		
+				markRepository.save(mark);	
+				logger.info("Mark added!");
 		return new ResponseEntity<>(mark, HttpStatus.OK);
 	}
 	
-	
+//	@Secured("ROLE_TEACHER")
+//	@RequestMapping(method = RequestMethod.POST, path = "/addMark")
+//	public ResponseEntity<?> addMarkToStudent(@Valid @RequestBody MarkDTO newMark, BindingResult result) {
+//		if (result.hasErrors()) 
+//			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST); 
+//	//UserEntity
+//
+//		if (!studentRepository.existsByUserName(newMark.getStudentUserName()))
+//			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);
+//		
+//		if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()))
+//			return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
+//	
+//		//	if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectSubjectClassGroupAndTeacherSubjectTeacherUserName(newMark.getSubject(),0,userService.getLoggedUser()))
+//	//		return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
+//		
+//
+//		MarkEntity mark=new MarkEntity();
+//				mark.setStudent(studentRepository.findByUserName(newMark.getStudentUserName()));
+//				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()));
+//				mark.setMark(newMark.getMark());
+//				mark.setDescription(newMark.getDescription());
+//				if(newMark.getDate()!=null)
+//					mark.setDate(newMark.getDate());
+//					else
+//						mark.setDate(LocalDate.now());
+//				mark.setSemester(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()).getTeachToClass().getClassInGrade().getSemester());
+//				markRepository.save(mark);		
+//		return new ResponseEntity<>(mark, HttpStatus.OK);
+//	}
 //  ******* DAVANJE OCENA UCENIKU OD STRANE ADMINISTRATORA *******
 	
 	@Secured("ROLE_ADMIN")
