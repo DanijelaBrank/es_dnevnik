@@ -71,26 +71,6 @@ public class TeacherController {
 		return new ResponseEntity<>(teacher, HttpStatus.OK);
 	}
 
-	
-//  ****** DODAVANJE PREDMETA NASTAVNIKU  *********
-	
-//	@Secured("ROLE_ADMIN")
-//	@RequestMapping(method = RequestMethod.POST, path = "/adddSubjectToTeacher")
-//	public ResponseEntity<?> addSubjectToTeacher(@Valid @RequestBody TeacherSubjectDTO newSubjectToTeacher,
-//			BindingResult result) {
-//		if (result.hasErrors())
-//			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-//		
-//		TeacherSubjectEntity subjectToTeacher = teacherService.addSubjectToTeacher(newSubjectToTeacher);
-//		if (subjectToTeacher == null)
-//			return new ResponseEntity<>("Subject or teacher doesn't exist or doesn't match.",
-//					HttpStatus.BAD_REQUEST);
-//		return new ResponseEntity<>(subjectToTeacher, HttpStatus.OK);
-//	}
-	
-
-	
-
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
 	}

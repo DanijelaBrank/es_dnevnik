@@ -20,49 +20,40 @@ import com.iktpreobuka.es_dnevnik.entities.TeacherSubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.SubjectDTO;
 import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectDTO;
 import com.iktpreobuka.es_dnevnik.repositories.SubjectRepository;
+import com.iktpreobuka.es_dnevnik.services.SubjectService;
 import com.iktpreobuka.es_dnevnik.services.TeacherService;
 
 @RestController
 public class SubjectController {
-	
+
+		
 	@Autowired
-	private SubjectRepository subjectRepository;
-	
+	private SubjectService subjectService;
+
 	@Autowired
 	private TeacherService teacherService;
 
 //  ****** DODAVANJE PREDMETA *********
 	@Secured("ROLE_ADMIN")
-	@RequestMapping(method = RequestMethod.POST,path = "/addSubject")
+	@RequestMapping(method = RequestMethod.POST, path = "/addSubject")
 	public ResponseEntity<?> addSubject(@Valid @RequestBody SubjectDTO newSubject, BindingResult result) {
-	if (result.hasErrors()) {
-	return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-	} 
-	SubjectEntity subject = new SubjectEntity();
-	subject.setName(newSubject.getName());
-	subject.setClassGroup(newSubject.getClassGroup());
-	
-
-
-	subjectRepository.save(subject);
-	return new ResponseEntity<>(subject, HttpStatus.OK);
+		if (result.hasErrors()) {
+			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
+		}
+		SubjectEntity subject =subjectService.addNewSubject(newSubject);		
+		return new ResponseEntity<>(subject, HttpStatus.OK);
 	}
-	
-	
-	
+
 //  ****** DODAVANJE PREDMETA NASTAVNIKU  *********
-	
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST, path = "/addSubjectToTeacher")
 	public ResponseEntity<?> addSubjectToTeacher(@Valid @RequestBody TeacherSubjectDTO newSubjectToTeacher,
 			BindingResult result) {
 		if (result.hasErrors())
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-		
+
 		TeacherSubjectEntity subjectToTeacher = teacherService.addSubjectToTeacher(newSubjectToTeacher);
-		if (subjectToTeacher == null)
-			return new ResponseEntity<>("Subject or teacher doesn't exist or doesn't match.",
-					HttpStatus.BAD_REQUEST);
 		return new ResponseEntity<>(subjectToTeacher, HttpStatus.OK);
 	}
 

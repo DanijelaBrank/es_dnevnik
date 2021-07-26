@@ -7,6 +7,7 @@ import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeacherSubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectDTO;
+import com.iktpreobuka.es_dnevnik.exceptions.ResourceNotFoundException;
 import com.iktpreobuka.es_dnevnik.repositories.SubjectRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeacherRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeacherSubjectRepository;
@@ -25,15 +26,16 @@ public class TeacherServiceImpl implements TeacherService {
 	private TeacherSubjectRepository teacherSubjectRepository;
 
 	@Override
-	public TeacherSubjectEntity addSubjectToTeacher(TeacherSubjectDTO newTeacherSubject) {
-		
-		
+	public TeacherSubjectEntity addSubjectToTeacher(TeacherSubjectDTO newTeacherSubject) { 
+				
 		if (!subjectRepository.existsByNameAndClassGroup(newTeacherSubject.getSubject(),
 				newTeacherSubject.getClassGroup()))
-			return null;
+			throw new ResourceNotFoundException("Subject not found");
+	//		return null;
 		if (!teacherRepository.existsByUserNameAndClassGroup(newTeacherSubject.getUserName(),
 				newTeacherSubject.getClassGroup()))
-			return null;
+			throw new ResourceNotFoundException("Teacher not found");
+	//		return null;
 		
 		SubjectEntity subjectForAdd = subjectRepository.findByNameAndClassGroup(newTeacherSubject.getSubject(),
 				newTeacherSubject.getClassGroup());
