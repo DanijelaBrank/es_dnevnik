@@ -44,9 +44,11 @@ public class UserEntity {
 	
 	@ManyToOne(cascade=CascadeType.REFRESH  , fetch=FetchType.LAZY)
 	@JoinColumn(name="address")
+	@JsonIgnore
 	private AddressEntity address;
 	
 	@Column(name = "phoneNo")
+	@JsonIgnore
 	private String phoneNo;
 	
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY )

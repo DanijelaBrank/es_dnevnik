@@ -33,6 +33,7 @@ import com.iktpreobuka.es_dnevnik.repositories.RoleRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeachingRepository;
 import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
+import com.iktpreobuka.es_dnevnik.services.ClassService;
 import com.iktpreobuka.es_dnevnik.utils.Encryption;
 import com.iktpreobuka.es_dnevnik.utils.UserCustomValidator;
 
@@ -56,13 +57,16 @@ public class StudentController {
 
 	@Autowired
 	private TeachingRepository teachingRepository;
-	
+
 	@Autowired
 	private MarkRepository markRepository;
-	
+
 	@Autowired
 	private GradeRepository gradeRepository;
-	
+
+	@Autowired
+	private ClassService classService;
+
 	@Autowired
 	UserCustomValidator userValidator;
 
@@ -71,8 +75,8 @@ public class StudentController {
 		binder.addValidators(userValidator);
 	}
 
-	//  ******* DODAVANJE UCENIKA  *******
-	
+	// ******* DODAVANJE UCENIKA *******
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST, path = "/addStudent")
 	public ResponseEntity<?> addStudent(@Valid @RequestBody UserDTO newUser, BindingResult result) {
@@ -95,18 +99,12 @@ public class StudentController {
 	}
 
 //  ******* DODAVANJE RODITELJA UCENIKU  *******
-	
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, path = "/addParentToStudent")
 	public ResponseEntity<?> addParentToStudent(@RequestParam String studentUserName,
 			@RequestParam String parentUserName) {
-//	if (result.hasErrors()) {
-//	return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-//	} 
-//	else {
-//	userValidator.validate(newUser, result);
-//	
-//	}
+
 		if (!userRepository.existsByUserName(studentUserName))
 			return new ResponseEntity<>("Student don't exists", HttpStatus.BAD_REQUEST);
 
@@ -122,61 +120,15 @@ public class StudentController {
 	}
 
 //  ******* DODAVANJE ODELJENJA UCENIKU  *******
-	
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, path = "/addClassToStudent")
 	public ResponseEntity<?> addClassToStudent(@RequestParam String studentUserName, @RequestParam Integer grade,
 			@RequestParam Integer sign) {
-//	if (result.hasErrors()) {
-//	return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-//	} 
-//	else {
-//	userValidator.validate(newUser, result);
-//	
-//	}
-		if (!studentRepository.existsByUserName(studentUserName))
-			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);
 
-		ClassEntity clazz = classRepository.findByClassInGradeGradeAndSign(grade, sign);
-
-		if (clazz == null)
-			return new ResponseEntity<>("Class doesn't exists", HttpStatus.BAD_REQUEST);
-
-		StudentEntity student = studentRepository.findByUserName(studentUserName);
-		student.setClassLevel(clazz);
-		studentRepository.save(student);
+		StudentEntity student = classService.classToStudent(studentUserName, grade, sign);
 		return new ResponseEntity<>(student, HttpStatus.OK);
 	}
-	
-//  ******* OCENJIVANJE UCENIKA  *******
-	
-//	@Secured("ROLE_ADMIN")
-//	@RequestMapping(method = RequestMethod.POST, path = "/addMark")
-//	public ResponseEntity<?> addMarkToStudent(@Valid @RequestBody MarkDTO newMark, BindingResult result) {
-//		if (result.hasErrors()) 
-//			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST); 
-//
-//		if (!studentRepository.existsByUserName(newMark.getStudentUserName()))
-//			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);
-//		
-//		if(!teachingRepository.existsByTeacherSubjectSubjectName(newMark.getSubject()))
-//			return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
-//		
-//		MarkEntity mark=new MarkEntity();
-//				mark.setStudent(studentRepository.findByUserName(newMark.getStudentUserName()));
-//				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()));
-//				mark.setMark(newMark.getMark());
-//				mark.setDescription(newMark.getDescription());
-//				if(!newMark.getDate().equals(null))
-//					mark.setDate(newMark.getDate());
-//					else
-//						mark.setDate(LocalDate.now());
-//				mark.setSemester(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()).getTeachToClass().getClassInGrade().getSemester());
-//				markRepository.save(mark);		
-//		return new ResponseEntity<>(mark, HttpStatus.OK);
-//	}
-	
-	
 
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));

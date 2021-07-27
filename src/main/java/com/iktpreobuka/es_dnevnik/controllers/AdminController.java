@@ -57,6 +57,12 @@ public class AdminController {
 		userRepository.save(user);
 		return new ResponseEntity<>(user, HttpStatus.OK);		
 	}
+	
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.GET, path = "/downloadLogFile")
+	public ResponseEntity<?> downloadLogFile(@Valid @RequestBody UserDTO newUser, BindingResult result) {
+		return null;
+	}
 
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));

@@ -99,17 +99,6 @@ public class MarkServiceImpl implements MarkService {
 		logger.info("Student "+student.getLastName()+" "+student.getName()+" does not attend that subject of "+ newMark.getSubject()+"!");
 		throw new ResourceNotFoundException("Student "+student.getLastName()+" "+student.getName()+" does not attend that subject of "+ newMark.getSubject()+"!");
 		}
-//		if (!subjectRepository.existsByNameAndClassGroup(newMark.getSubject(), logTeacher.getClassGroup())) {
-//			logger.info("Subject doesn't exists!");
-//			throw new ResourceNotFoundException("Subject not found");
-//		}
-//		SubjectEntity sub = subjectRepository.findByNameAndClassGroup(newMark.getSubject(), logTeacher.getClassGroup());
-
-//		if (!teachingRepository.existsByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClassStudents(sub,
-//				logTeacher, student)) {
-//			logger.info("Logged-in teacher doesn't teach that subject to that student!");
-//			throw new ResourceNotFoundException("You don't teach that subject to that student!");
-//		}
 		MarkEntity mark = new MarkEntity();
 		mark.setStudent(student);
 		mark.setGrader(teachingRepository.findByTeacherSubjectSubjectNameAndTeachToClassStudents(newMark.getSubject(),student));
