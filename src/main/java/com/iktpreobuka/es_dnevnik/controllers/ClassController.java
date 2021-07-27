@@ -16,11 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktpreobuka.es_dnevnik.entities.ClassEntity;
-import com.iktpreobuka.es_dnevnik.entities.TeacherSubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.ClassDTO;
 import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectClassDTO;
-import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectDTO;
 import com.iktpreobuka.es_dnevnik.repositories.ClassRepository;
 import com.iktpreobuka.es_dnevnik.repositories.GradeRepository;
 import com.iktpreobuka.es_dnevnik.services.ClassService;
@@ -29,11 +27,9 @@ import com.iktpreobuka.es_dnevnik.services.ClassService;
 public class ClassController {
 	
 	@Autowired
-	private ClassRepository classRepository;
-	
+	private ClassRepository classRepository;	
 	@Autowired
-	private GradeRepository gradeRepository;
-	
+	private GradeRepository gradeRepository;	
 	@Autowired
 	private ClassService classService;
 
@@ -44,7 +40,6 @@ public class ClassController {
 		if (result.hasErrors())
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		ClassEntity clazz=new ClassEntity();
-	//	GradeEntity gradeClass= gradeRepository.findByGrade(newClass.getGrade());
 		clazz.setClassInGrade(gradeRepository.findByGrade(newClass.getGrade()));
 		clazz.setSign(newClass.getSign());
 		classRepository.save(clazz);
@@ -60,9 +55,6 @@ public class ClassController {
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 		
 		TeachingEntity teachingToClass = classService.addTeachingToClass(newSubjectTeacherToClass);
-		if (teachingToClass == null)
-			return new ResponseEntity<>("Subject or teacher or class doesn't exist or doesn't match.",
-					HttpStatus.BAD_REQUEST);
 		return new ResponseEntity<>(teachingToClass, HttpStatus.OK);
 	}
 	

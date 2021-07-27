@@ -13,12 +13,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class MarkDTO {
 
-	@NotBlank(message = "Username must be not blank or null.")
+	@NotNull(message = "Username must be provided.")
 	@Size(min = 5, max = 15, message = "Username must be between {min} and {max} characters long.")
 	@Column(nullable = false)
 	private String studentUserName;
 
-	@NotBlank(message = "Subject name must be not blank or null.")
+	@NotNull(message = "Subject name must be provided.")
 	@Size(min = 2, max = 30, message = "Subject name lenght must be string between {min} and {max}.")
 	@Column(nullable = false)
 	private String subject;

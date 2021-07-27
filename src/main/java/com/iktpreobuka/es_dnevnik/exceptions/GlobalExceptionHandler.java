@@ -15,5 +15,10 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<?>resourceNotFaundException(ResourceNotFoundException e,ServletWebRequest request){
 		return new ResponseEntity<>(new RESTError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
 	}
+	
+	@ExceptionHandler(NullPointerException.class)
+	public ResponseEntity<?>nullPointerException(NullPointerException e,ServletWebRequest request){
+		return new ResponseEntity<>(new RESTError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }

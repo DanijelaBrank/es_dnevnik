@@ -5,4 +5,5 @@ import com.iktpreobuka.es_dnevnik.entities.dto.MarkDTO;
 
 public interface MarkService {
 	public MarkEntity addMark(MarkDTO newMark);
+	public MarkEntity addMarkByAdmin(MarkDTO newMark); 
 }
