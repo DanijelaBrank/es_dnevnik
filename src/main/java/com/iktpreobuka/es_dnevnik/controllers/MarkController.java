@@ -23,10 +23,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iktpreobuka.es_dnevnik.entities.MarkEntity;
 import com.iktpreobuka.es_dnevnik.entities.ParentEntity;
 import com.iktpreobuka.es_dnevnik.entities.StudentEntity;
+import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
+import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
+import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.MarkDTO;
 import com.iktpreobuka.es_dnevnik.exceptions.ResourceNotFoundException;
+import com.iktpreobuka.es_dnevnik.repositories.MarkRepository;
 import com.iktpreobuka.es_dnevnik.repositories.ParentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
+import com.iktpreobuka.es_dnevnik.repositories.TeacherRepository;
 import com.iktpreobuka.es_dnevnik.services.MarkService;
 import com.iktpreobuka.es_dnevnik.services.UserService;
 
@@ -43,8 +48,13 @@ public class MarkController {
 	private StudentRepository studentRepository;
 	@Autowired
 	private ParentRepository parentRepository;
+	@Autowired
+	private TeacherRepository teacherRepository;
+	@Autowired
+	private MarkRepository markRepository;
 
-//  ******* OCENJIVANJE UCENIKA  *******
+
+//  ******* OCENJIVANJE UCENIKA OD STRANE PROFESORA *******
 
 	@Secured("ROLE_TEACHER")
 	@RequestMapping(method = RequestMethod.POST, path = "/addMark")
@@ -132,4 +142,47 @@ public class MarkController {
 				+ " from subject " + subjectName + ".");
 		return marksSt;
 	}
+	
+//  ******* PRETRAGA OCENA OD STRANE PROFESORA *******
+
+	@Secured("ROLE_TEACHER")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectMarkByTeacher/{studentUserName}/{subjectName}")
+	public List<String> getSubjectMarkByTeacher(@PathVariable String studentUserName, @PathVariable String subjectName) {
+
+		TeachingEntity grader=markService.logTeacherTeachingSubjectToStudent(studentUserName, subjectName);
+		List<MarkEntity> marks=markRepository.findByStudentUserNameAndGrader(studentUserName,grader);
+		List<String> marksToStudent=new  ArrayList<String>();
+		for(MarkEntity mark:marks) {
+			String markToStudent=mark.toStudentString();
+			marksToStudent.add(markToStudent);
+		}	
+		logger.info("Profesor " + userService.getLoggedUser() + " looked at the grades for student " + studentUserName
+				+ " from subject " + subjectName + ".");
+		return marksToStudent;
+				
+	}	
+	
+	@Secured("ROLE_TEACHER")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectInClassMarkByTeacher/{subjectName}/{grade}/{sign}")
+	public List<String> getSubjectMarkInClassByTeacher( @PathVariable String subjectName,@PathVariable Integer grade,@PathVariable Integer sign) {
+
+		TeachingEntity grader=markService.logTeacherTeachingSubjectToClass(subjectName, grade, sign);
+		List<MarkEntity> marks=markRepository.findByGrader(grader);
+		List<String> marksToClass=new  ArrayList<String>();
+		for(MarkEntity mark:marks) {
+			String markToStudent=mark.toStudentString();
+			marksToClass.add(markToStudent);
+		}	
+		logger.info("Profesor " + userService.getLoggedUser() + " looked at the grades for class " + grade+"/"+sign
+				+ " from subject " + subjectName + ".");
+		return marksToClass;
+				
+	}	
+				
+		
+
+		
+		
+		
+		
 }

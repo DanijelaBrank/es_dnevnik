@@ -7,16 +7,17 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.iktpreobuka.es_dnevnik.entities.ClassEntity;
 import com.iktpreobuka.es_dnevnik.entities.MarkEntity;
 import com.iktpreobuka.es_dnevnik.entities.StudentEntity;
 import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
+import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.MarkDTO;
 import com.iktpreobuka.es_dnevnik.exceptions.ResourceNotFoundException;
+import com.iktpreobuka.es_dnevnik.repositories.ClassRepository;
 import com.iktpreobuka.es_dnevnik.repositories.MarkRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.SubjectRepository;
@@ -38,6 +39,8 @@ public class MarkServiceImpl implements MarkService {
 	private MarkRepository markRepository;
 	@Autowired
 	private SubjectRepository subjectRepository;
+	@Autowired
+	private ClassRepository classRepository;
 	@Autowired
 	private UserService userService;
 	@Autowired
@@ -137,6 +140,10 @@ public class MarkServiceImpl implements MarkService {
 
 	@Override
 	public List<String> findStudentMark(StudentEntity student, String subjectName) {
+		if(!markRepository.existsByStudentAndGraderTeacherSubjectSubjectName(student,subjectName)) {
+			logger.info("Student " + student + " does not attend the subject"+subjectName);					
+			throw new ResourceNotFoundException("Student " + student.getUserName() + " does not attend the subject "+subjectName);
+		}
 		List<MarkEntity> marks=markRepository.findByStudentAndGraderTeacherSubjectSubjectName(student,subjectName);
 		List<String> marksToStudent=new  ArrayList<String>();
 		for(MarkEntity mark:marks) {
@@ -145,5 +152,60 @@ public class MarkServiceImpl implements MarkService {
 		}		
 		return marksToStudent;
 	}
+
+	@Override
+	public TeachingEntity logTeacherTeachingSubjectToStudent(String studentUserName, String subjectName) {
+		
+		TeacherEntity logTeacher = teacherRepository.findByUserName(userService.getLoggedUser());
+
+		if (!studentRepository.existsByUserName(studentUserName)) {
+			logger.info("Student " + studentUserName + " doesn't exists!");
+			throw new ResourceNotFoundException("Student not found");
+		}
+		StudentEntity student = studentRepository.findByUserName(studentUserName);
+
+		if (!subjectRepository.existsByNameAndClassGroup(subjectName, logTeacher.getClassGroup())) {
+			logger.info("Subject doesn't exists!");
+			throw new ResourceNotFoundException("Subject not found");
+		}
+		SubjectEntity sub = subjectRepository.findByNameAndClassGroup(subjectName, logTeacher.getClassGroup());
+
+		if (!teachingRepository.existsByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClassStudents(sub,
+				logTeacher, student)) {
+			logger.info("Logged-in teacher doesn't teach that subject to that student!");
+			throw new ResourceNotFoundException("You don't teach that subject to that student!");
+		}
+		TeachingEntity grader=teachingRepository.findByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClassStudents(sub,
+				logTeacher, student); 
+		return grader;
+	}
+	
+	
+	@Override
+	public TeachingEntity logTeacherTeachingSubjectToClass(String subjectName, Integer grade, Integer sign) {
+		
+			TeacherEntity logTeacher = teacherRepository.findByUserName(userService.getLoggedUser());
+
+		if (!subjectRepository.existsByNameAndClassGroup(subjectName, logTeacher.getClassGroup())) {
+			logger.info("Subject doesn't exists!");
+			throw new ResourceNotFoundException("Subject not found");
+		}
+		SubjectEntity sub = subjectRepository.findByNameAndClassGroup(subjectName, logTeacher.getClassGroup());
+		ClassEntity clazz=classRepository.findByClassInGradeGradeAndSign(grade,sign);
+		if(clazz==null) {
+			logger.info("That class doesn't exist!");
+			throw new ResourceNotFoundException("That class doesn't exist!");
+		}		
+		if (!teachingRepository.existsByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClass(sub,
+				logTeacher, clazz)) {
+			logger.info("Logged-in teacher doesn't teach that subject to that class!");
+			throw new ResourceNotFoundException("You don't teach that subject to that class!");
+		}
+		TeachingEntity grader=teachingRepository.findByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClass(sub,
+				logTeacher, clazz);
+		return grader;
+	}
+	
+	
 
 }

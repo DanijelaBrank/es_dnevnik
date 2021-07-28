@@ -2,6 +2,7 @@ package com.iktpreobuka.es_dnevnik.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 
+import com.iktpreobuka.es_dnevnik.entities.ClassEntity;
 import com.iktpreobuka.es_dnevnik.entities.EClassGroup;
 import com.iktpreobuka.es_dnevnik.entities.StudentEntity;
 import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
@@ -36,5 +37,14 @@ public interface TeachingRepository extends CrudRepository<TeachingEntity, Integ
 	boolean existsByTeacherSubjectSubjectNameAndTeachToClassStudents(String subject, StudentEntity student);
 
 	TeachingEntity findByTeacherSubjectSubjectNameAndTeachToClassStudents(String subject, StudentEntity student);
+
+	TeachingEntity findByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClassStudents(SubjectEntity subject,
+			TeacherEntity teacher, StudentEntity student);
+
+	boolean existsByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClass(SubjectEntity sub,
+			TeacherEntity logTeacher, ClassEntity clazz);
+
+	TeachingEntity findByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClass(SubjectEntity sub,
+			TeacherEntity logTeacher, ClassEntity clazz);
 
 }
