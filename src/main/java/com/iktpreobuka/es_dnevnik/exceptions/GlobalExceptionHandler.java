@@ -1,5 +1,7 @@
 package com.iktpreobuka.es_dnevnik.exceptions;
 
+import java.io.FileNotFoundException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,4 +23,9 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(new RESTError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@ExceptionHandler(FileNotFoundException.class)
+	public ResponseEntity<?>fileNotFoundException(FileNotFoundException e,ServletWebRequest request){
+		return new ResponseEntity<>(new RESTError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 }

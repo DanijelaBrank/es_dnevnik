@@ -13,6 +13,8 @@ public interface TeacherRepository extends CrudRepository <TeacherEntity,Integer
 
 	TeacherEntity findByUserName(String userName);
 
-	
+	boolean existsByUserName(String userName);
+
+		
 
 }

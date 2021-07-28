@@ -1,6 +1,8 @@
 package com.iktpreobuka.es_dnevnik.services;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,6 +121,29 @@ public class MarkServiceImpl implements MarkService {
 		emailService.sendSimpleEmailMessage(mailTo, mailSubject, mailText);
 		logger.info("Mail with added mark has been sent to Mr/Mrs "+student.getParent().getLastName()+".");
 		return mark;
+	}
+
+	@Override
+	public List<String> findStudentMark(StudentEntity student) {
+		
+		List<MarkEntity> marks=markRepository.findByStudent(student);
+		List<String> marksToStudent=new  ArrayList<String>();
+		for(MarkEntity mark:marks) {
+			String markToStudent=mark.toStudentString();
+			marksToStudent.add(markToStudent);
+		}		
+		return marksToStudent;
+	}
+
+	@Override
+	public List<String> findStudentMark(StudentEntity student, String subjectName) {
+		List<MarkEntity> marks=markRepository.findByStudentAndGraderTeacherSubjectSubjectName(student,subjectName);
+		List<String> marksToStudent=new  ArrayList<String>();
+		for(MarkEntity mark:marks) {
+			String markToStudent=mark.toStudentString();
+			marksToStudent.add(markToStudent);
+		}		
+		return marksToStudent;
 	}
 
 }

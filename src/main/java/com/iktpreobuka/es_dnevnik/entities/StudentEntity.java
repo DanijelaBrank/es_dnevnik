@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties({ "handler", "hibernateLazyInitializer" })
 public class StudentEntity extends UserEntity {
 	
+	@JsonIgnore
 	LocalDate dateOfBirth;
 	
 	@ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.LAZY)

@@ -111,7 +111,7 @@ public class ClassServiceImpl implements ClassService {
 					+ ", now is on grade with sign " + grade + "/" + sign;
 
 		else
-			message = "Student " + studentUserName + " is on grade with sign " + grade + "/" + sign;
+			message = "Student " + studentUserName + " is added in grade with sign " + grade + "/" + sign;
 		student.setClassLevel(clazz);
 		logger.info(message);
 		studentRepository.save(student);

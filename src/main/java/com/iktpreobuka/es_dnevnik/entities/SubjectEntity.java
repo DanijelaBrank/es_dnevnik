@@ -29,7 +29,9 @@ public class SubjectEntity {
 	@Column(name = "class_group")
 	private EClassGroup classGroup;
 	
-	@OneToMany(mappedBy = "subject", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	// *****Fond casova (private Integer hoursFund;) se nalazi u SubjectInGradeEntity jer jedan predmet nemaisti fon casova u svakom razredu ***
+	
+	@OneToMany(mappedBy = "subject", cascade = CascadeType.REFRESH  , fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<TeacherSubjectEntity> subjectTeacher;
 	
