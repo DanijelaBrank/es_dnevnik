@@ -50,4 +50,7 @@ public interface TeachingRepository extends CrudRepository<TeachingEntity, Integ
 
 	boolean existsByTeacherSubjectAndTeachToClass(TeacherSubjectEntity tsAdd, ClassEntity classToAdd);
 
+	TeachingEntity findByTeacherSubjectSubjectNameAndTeachToClassClassInGradeGradeAndTeachToClassSign(
+			String subjectName, Integer grade, Integer sign);
+
 }

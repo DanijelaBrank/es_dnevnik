@@ -33,6 +33,8 @@ import com.iktpreobuka.es_dnevnik.repositories.MarkRepository;
 import com.iktpreobuka.es_dnevnik.repositories.ParentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeacherRepository;
+import com.iktpreobuka.es_dnevnik.repositories.TeachingRepository;
+import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
 import com.iktpreobuka.es_dnevnik.services.MarkService;
 import com.iktpreobuka.es_dnevnik.services.UserService;
 
@@ -53,6 +55,10 @@ public class MarkController {
 	private TeacherRepository teacherRepository;
 	@Autowired
 	private MarkRepository markRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private TeachingRepository teachingRepository;
 
 
 //  ******* OCENJIVANJE UCENIKA OD STRANE PROFESORA *******
@@ -82,6 +88,16 @@ public class MarkController {
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
 
+	}
+	
+//  ******* ZAKLJUCNA OCENA UCENIKU OD STRANE PROFESORA *******
+
+	@Secured("ROLE_TEACHER")
+	@RequestMapping(method = RequestMethod.POST, path = "/addFinalMark/{studentName}/{subject}")
+	public ResponseEntity<?> addFinalMarkToStudent(@PathVariable String studentName,@PathVariable String subject) {
+		
+		MarkEntity mark = markService.addFinalMark(studentName,subject);
+		return new ResponseEntity<>(mark, HttpStatus.OK);
 	}
 
 //  ******* PRETRAGA OCENA OD STRANE UCENIKA *******
@@ -177,8 +193,67 @@ public class MarkController {
 		logger.info("Profesor " + userService.getLoggedUser() + " looked at the grades for class " + grade+"/"+sign
 				+ " from subject " + subjectName + ".");
 		return marksToClass;
-				
+					
 	}	
+	
+	
+//  ******* PRETRAGA OCENA OD STRANE ADMINA *******
+
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.GET, path = "/getStudentMarkByAdmin/{studentUserName}")
+	public List<String> getStudentMarkByAdmin(@PathVariable String studentUserName) {
+
+		UserEntity logAdmin = userRepository.findByUserName(userService.getLoggedUser());
+		if (!studentRepository.existsByUserName(studentUserName )) {
+			logger.info("Student "+ studentUserName + " doesn't exists. ");
+			throw new ResourceNotFoundException("Student "+ studentUserName + " doesn't exists. ");
+		}
+		StudentEntity student = studentRepository.findByUserName(studentUserName);
+		List<String> marksSt = new ArrayList<String>();
+		marksSt = markService.findStudentMark(student);
+		logger.info("Admin " + logAdmin.getUserName() + " looked at the grades for student " + studentUserName + "!");
+		return marksSt;
+	}
+
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectMarkByAdmin/{studentUserName}/{subjectName}")
+	public List<String> getSubjectMarkByAdmin(@PathVariable String studentUserName, @PathVariable String subjectName) {
+
+		UserEntity logAdmin = userRepository.findByUserName(userService.getLoggedUser());
+		if (!studentRepository.existsByUserName(studentUserName )) {
+			logger.info("Student "+ studentUserName + " doesn't exists. ");
+			throw new ResourceNotFoundException("Student "+ studentUserName + " doesn't exists. ");
+		}
+		StudentEntity student = studentRepository.findByUserName(studentUserName);
+		List<String> marksSt = new ArrayList<String>();
+		marksSt = markService.findStudentMark(student, subjectName);
+		logger.info("Admin " + logAdmin.getUserName() + " looked at the grades for student " + studentUserName
+				+ " from subject " + subjectName + ".");
+		return marksSt;
+	}
+	
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectInClassMarkByAdmin/{subjectName}/{grade}/{sign}")
+	public List<String> getSubjectMarkInClassByAdmin( @PathVariable String subjectName,@PathVariable Integer grade,@PathVariable Integer sign) {
+
+		//UserEntity logAdmin = userRepository.findByUserName(userService.getLoggedUser());
+		
+		TeachingEntity grader=teachingRepository.findByTeacherSubjectSubjectNameAndTeachToClassClassInGradeGradeAndTeachToClassSign(subjectName,grade,sign);
+				//markService.logTeacherTeachingSubjectToClass(subjectName, grade, sign);
+		List<MarkEntity> marks=markRepository.findByGrader(grader);
+		List<String> marksToClass=new  ArrayList<String>();
+		for(MarkEntity mark:marks) {
+			String markToStudent=mark.toStudentString();
+			marksToClass.add(markToStudent);
+		}	
+		logger.info("Admin " + userService.getLoggedUser() + " looked marks at the grades for class " + grade+"/"+sign
+				+ " from subject " + subjectName + ".");
+		return marksToClass;
+					
+	}	
+	
+	
+//  ******* BRISANJE OCENA OD STRANE ADMINA *******
 	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "deleteMark/{id}")
@@ -191,15 +266,7 @@ public class MarkController {
 		return mark;
 	}
 	
-//  ******* ZAKLJUCNA OCENA UCENIKU OD STRANE PROFESORA *******
 
-	@Secured("ROLE_TEACHER")
-	@RequestMapping(method = RequestMethod.POST, path = "/addFinalMark/{studentName}/{subject}")
-	public ResponseEntity<?> addFinalMarkToStudent(@PathVariable String studentName,@PathVariable String subject) {
-		
-		MarkEntity mark = markService.addFinalMark(studentName,subject);
-		return new ResponseEntity<>(mark, HttpStatus.OK);
-	}
 				
 		
 
