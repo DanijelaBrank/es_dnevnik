@@ -14,6 +14,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -89,5 +90,24 @@ public class UserController {
 		userRepository.delete(user);
 		return user;
 	}
+	
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.PUT, value = "changeUser/{userName}")
+	public UserEntity changeUser(@RequestBody UserEntity newUser, @PathVariable String userName) {
+		if (!userRepository.existsByUserName(userName))
+			return null;
+		UserEntity user = userRepository.findByUserName(userName);
+		if (newUser.getName() != null)
+			user.setName(newUser.getName());
+		if (newUser.getLastName() != null)
+			user.setLastName(newUser.getLastName());
+		if (newUser.getUserName() != null)
+			user.setUserName(newUser.getUserName());
+		if (newUser.getEmail() != null)
+			user.setEmail(newUser.getEmail());
+		return userRepository.save(user);
+	}
+	
+	
 
 }
