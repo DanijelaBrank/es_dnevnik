@@ -205,6 +205,63 @@ public class MarkServiceImpl implements MarkService {
 				logTeacher, clazz);
 		return grader;
 	}
+
+//  ******* SERVIS - ZAKLJUCNA OCENA UCENIKU OD STRANE PROFESORA *******
+	
+	@Override
+	public MarkEntity addFinalMark(String studentUserName, String subject) {
+		
+		TeacherEntity logTeacher = teacherRepository.findByUserName(userService.getLoggedUser());
+		
+		if (!studentRepository.existsByUserName(studentUserName)) {
+			logger.info("Student " + studentUserName + " doesn't exists!");
+			throw new ResourceNotFoundException("Student not found");
+		}
+		StudentEntity student = studentRepository.findByUserName(studentUserName);
+
+		if (!subjectRepository.existsByNameAndClassGroup(subject, logTeacher.getClassGroup())) {
+			logger.info("Subject doesn't exists!");
+			throw new ResourceNotFoundException("Subject not found");
+		}
+		SubjectEntity sub = subjectRepository.findByNameAndClassGroup(subject, logTeacher.getClassGroup());
+
+		if (!teachingRepository.existsByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClassStudents(sub,
+				logTeacher, student)) {
+			logger.info("Logged-in teacher doesn't teach that subject to that student!");
+			throw new ResourceNotFoundException("You don't teach that subject to that student!");
+		}
+		MarkEntity finalMark = new MarkEntity();
+		finalMark.setStudent(student);
+		finalMark.setGrader(teachingRepository.findByTeacherSubjectSubjectAndTeacherSubjectTeacher(sub, logTeacher));
+		Double sumMark=0.0;
+		Integer noMark=0;
+		List<MarkEntity> marks=markRepository.findByStudent(student);
+						
+		for(MarkEntity m:marks) {
+			sumMark+=m.getMark();
+			noMark++;
+		}
+		Integer fm=(int)Math.round(sumMark/noMark);
+		finalMark.setMark(fm);			
+		finalMark.setDate(LocalDate.now());
+		finalMark.setSemester(student.getClassLevel().getClassInGrade().getSemester());
+		if(finalMark.getSemester()==1)
+			finalMark.setDescription("Final Mark 1");
+		else
+			finalMark.setDescription("Final Mark 2");
+		markRepository.save(finalMark);
+		
+		String mailTo = student.getParent().getEmail();
+		String mailSubject = "Final mark";
+		String mailText = "Student " + student.getLastName() + " " + student.getName() + " from the subject "
+				+ sub.getName() + " received a grade " + finalMark.getMark() + " on the " + finalMark.getDescription()
+				+ " from the teacher " + logTeacher.getLastName();
+		logger.info(mailText);
+		emailService.sendSimpleEmailMessage(mailTo, mailSubject, mailText);
+		logger.info("Mail with added mark has been sent to Mr/Mrs "+student.getParent().getLastName()+".");
+		return finalMark;
+	}
+	
 	
 	
 

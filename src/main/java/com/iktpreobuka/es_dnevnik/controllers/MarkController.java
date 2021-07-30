@@ -190,6 +190,16 @@ public class MarkController {
 		logger.info("Mark with ID= " + mark.getId() + " deleted by admin."); 
 		return mark;
 	}
+	
+//  ******* ZAKLJUCNA OCENA UCENIKU OD STRANE PROFESORA *******
+
+	@Secured("ROLE_TEACHER")
+	@RequestMapping(method = RequestMethod.POST, path = "/addFinalMark/{studentName}/{subject}")
+	public ResponseEntity<?> addFinalMarkToStudent(@PathVariable String studentName,@PathVariable String subject) {
+		
+		MarkEntity mark = markService.addFinalMark(studentName,subject);
+		return new ResponseEntity<>(mark, HttpStatus.OK);
+	}
 				
 		
 

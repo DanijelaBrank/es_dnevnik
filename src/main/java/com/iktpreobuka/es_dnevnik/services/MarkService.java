@@ -13,5 +13,6 @@ public interface MarkService {
 	public List<String> findStudentMark(StudentEntity student);
 	public List<String> findStudentMark(StudentEntity student, String subjectName); 
 	public TeachingEntity logTeacherTeachingSubjectToStudent(String studentUserName, String subjectName);
-	TeachingEntity logTeacherTeachingSubjectToClass(String subjectName, Integer grade, Integer sign); 
+	TeachingEntity logTeacherTeachingSubjectToClass(String subjectName, Integer grade, Integer sign);
+	public MarkEntity addFinalMark(String studentName, String subject); 
 }
