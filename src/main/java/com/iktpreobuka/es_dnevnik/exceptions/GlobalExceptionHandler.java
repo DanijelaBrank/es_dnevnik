@@ -1,6 +1,7 @@
 package com.iktpreobuka.es_dnevnik.exceptions;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,16 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(FileNotFoundException.class)
 	public ResponseEntity<?>fileNotFoundException(FileNotFoundException e,ServletWebRequest request){
 		return new ResponseEntity<>(new RESTError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+	public ResponseEntity<?>sqlIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e,ServletWebRequest request){
+		return new ResponseEntity<>(new RESTError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@ExceptionHandler(ObjectAlreadyExistsException.class)
+	public ResponseEntity<?>objectAlreadyExistsException(ObjectAlreadyExistsException e,ServletWebRequest request){
+		return new ResponseEntity<>(new RESTError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
 	}
 	
 }

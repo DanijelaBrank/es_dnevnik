@@ -86,7 +86,6 @@ public class StudentController {
 
 		}
 		StudentEntity student = new StudentEntity();
-		// UserEntity user=userService.addUser(newUser);
 		student.setName(newUser.getName());
 		student.setLastName(newUser.getLastName());
 		student.setUserName(newUser.getUserName());
@@ -104,12 +103,14 @@ public class StudentController {
 	public ResponseEntity<?> addParentToStudent(@RequestParam String studentUserName,
 			@RequestParam String parentUserName) {
 
-		if (!userRepository.existsByUserName(studentUserName))
-			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);
-
-		if (!userRepository.existsByUserName(parentUserName))
-			return new ResponseEntity<>("Parent doesn't exists", HttpStatus.BAD_REQUEST);
-
+		if (!userRepository.existsByUserNameAndRoleId(studentUserName,4)) {
+			logger.info("Student with Username "+studentUserName+" doesn't exists!");
+			return new ResponseEntity<>("Student with Username "+studentUserName+" doesn't exists!", HttpStatus.BAD_REQUEST);
+		}
+		if (!userRepository.existsByUserNameAndRoleId(parentUserName,3)) {
+			logger.info("Parent with Username "+parentUserName+" doesn't exists!");
+			return new ResponseEntity<>("Parent with Username "+parentUserName+" doesn't exists!", HttpStatus.BAD_REQUEST);
+		}
 		StudentEntity student = studentRepository.findByUserName(studentUserName);
 		ParentEntity parent = parentRepository.findByUserName(parentUserName);
 

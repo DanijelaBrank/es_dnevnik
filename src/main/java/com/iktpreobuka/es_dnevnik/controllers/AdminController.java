@@ -39,9 +39,7 @@ import com.iktpreobuka.es_dnevnik.utils.UserCustomValidator;
 
 @RestController
 public class AdminController {
-	
-	// private static final String EXTERNAL_FILE_PATH = "D:\\Danijela\\IT obuka\\Backend\\es_dnevnik\\logs\\spring-boot-logging.log";
-
+		
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
@@ -77,17 +75,14 @@ public class AdminController {
 		return new ResponseEntity<>(user, HttpStatus.OK);		
 	}
 	
+	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.GET, path = "/downloadLogFile")
 	public void downloadLogFile(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		File file = new File("D:\\Danijela\\IT obuka\\Backend\\es_dnevnik\\logs\\spring-boot-logging.log");  //EXTERNAL_FILE_PATH + fileName);
-		//File file = new File("D:\\Danijela\\IT obuka\\Backend\\es_dnevnik\\logs"); 
+		File file = new File("D:\\Danijela\\IT obuka\\Backend\\es_dnevnik\\logs\\spring-boot-logging.log");  
+		
 		if (file.exists()) {
-			//logger.info("File doesn't exist.");
-			//throw new FileNotFoundException("File doesn't exist.");}
-			
-
 			
 			String mimeType = URLConnection.guessContentTypeFromName(file.getName());
 			if (mimeType == null) {
@@ -95,28 +90,13 @@ public class AdminController {
 			}
 			response.setContentType(mimeType);
 
-			/**
-			 * In a regular HTTP response, the Content-Disposition response header is a
-			 * header indicating if the content is expected to be displayed inline in the
-			 * browser, that is, as a Web page or as part of a Web page, or as an
-			 * attachment, that is downloaded and saved locally.
-			 * 
-			 */
-
-			/**
-			 * Here we have mentioned it to show inline
-			 */
-			//response.setHeader("Content-Disposition", String.format("inline; filename=\"" + file.getName() + "\""));
-
-			 //Here we have mentioned it to show as attachment
-			 response.setHeader("Content-Disposition", String.format("attachment; filename=\"" + file.getName() + "\""));
+			response.setHeader("Content-Disposition", String.format("attachment; filename=\"" + file.getName() + "\""));
 
 			response.setContentLength((int) file.length());
 
 			InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
 
 			FileCopyUtils.copy(inputStream, response.getOutputStream());
-
 		}	
 	
 	}

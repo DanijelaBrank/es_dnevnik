@@ -4,6 +4,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import com.iktpreobuka.es_dnevnik.entities.ClassEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.ClassDTO;
 import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectClassDTO;
+import com.iktpreobuka.es_dnevnik.exceptions.ObjectAlreadyExistsException;
 import com.iktpreobuka.es_dnevnik.repositories.ClassRepository;
 import com.iktpreobuka.es_dnevnik.repositories.GradeRepository;
 import com.iktpreobuka.es_dnevnik.services.ClassService;
@@ -26,19 +29,28 @@ import com.iktpreobuka.es_dnevnik.services.ClassService;
 @RestController
 public class ClassController {
 	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	@Autowired
 	private ClassRepository classRepository;	
 	@Autowired
 	private GradeRepository gradeRepository;	
 	@Autowired
 	private ClassService classService;
+	
 
 //  ****** DODAVANJE ODELJENJA  *********	
+	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST, path = "/addClass")
 	public ResponseEntity<?> addClass(@Valid @RequestBody ClassDTO newClass, BindingResult result) {
 		if (result.hasErrors())
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
+		
+		if(classRepository.existsByClassInGradeGradeAndSign(newClass.getGrade(),newClass.getSign())) {						
+			logger.info("Admin tried to add exists class in grade.");
+			throw new ObjectAlreadyExistsException("That class in grade already exists");}			
+		
 		ClassEntity clazz=new ClassEntity();
 		clazz.setClassInGrade(gradeRepository.findByGrade(newClass.getGrade()));
 		clazz.setSign(newClass.getSign());

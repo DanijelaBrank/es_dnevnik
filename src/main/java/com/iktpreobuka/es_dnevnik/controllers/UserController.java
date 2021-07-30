@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,6 +41,8 @@ public class UserController {
 
 	@Value("${spring.security.token-duration}")
 	private Integer tokenDuration;
+	
+//  ****** LOGOVANJE KORISNIKA  *********
 
 	@RequestMapping(path = "/login", method = RequestMethod.POST)
 	public ResponseEntity<?> login(@RequestParam String userName, @RequestParam String pwd) {
@@ -49,7 +52,7 @@ public class UserController {
 			UserTokenDTO user = new UserTokenDTO();
 			user.setUser(userName);
 			user.setToken(token);
-			logger.info("Successful login!");
+			logger.info("Successful login by "+userName);
 			return new ResponseEntity<>(user, HttpStatus.OK);
 		}
 		logger.info("Wrong login credentials!");
@@ -72,9 +75,19 @@ public class UserController {
 	}
 
 	@Secured("ROLE_ADMIN")
-	@RequestMapping("/test")
+	@RequestMapping("/getAllUsers")
 	public ResponseEntity<?> getAllUsers() {
 		return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+	}
+	
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.DELETE, value = "deleteUser/{id}")
+	public UserEntity deleteUser(@PathVariable Integer id) {
+		if (!userRepository.existsById(id))
+			return null;
+		UserEntity user = userRepository.findById(id).get();
+		userRepository.delete(user);
+		return user;
 	}
 
 }

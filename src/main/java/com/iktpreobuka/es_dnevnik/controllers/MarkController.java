@@ -26,6 +26,7 @@ import com.iktpreobuka.es_dnevnik.entities.StudentEntity;
 import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
+import com.iktpreobuka.es_dnevnik.entities.UserEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.MarkDTO;
 import com.iktpreobuka.es_dnevnik.exceptions.ResourceNotFoundException;
 import com.iktpreobuka.es_dnevnik.repositories.MarkRepository;
@@ -178,6 +179,17 @@ public class MarkController {
 		return marksToClass;
 				
 	}	
+	
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.DELETE, value = "deleteMark/{id}")
+	public MarkEntity deleteMark(@PathVariable Integer id) {
+		if (!markRepository.existsById(id)) 			
+			return null;
+		MarkEntity mark = markRepository.findById(id).get();
+		markRepository.delete(mark);
+		logger.info("Mark with ID= " + mark.getId() + " deleted by admin."); 
+		return mark;
+	}
 				
 		
 

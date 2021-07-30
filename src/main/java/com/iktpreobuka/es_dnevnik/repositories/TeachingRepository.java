@@ -7,6 +7,7 @@ import com.iktpreobuka.es_dnevnik.entities.EClassGroup;
 import com.iktpreobuka.es_dnevnik.entities.StudentEntity;
 import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
+import com.iktpreobuka.es_dnevnik.entities.TeacherSubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 
 public interface TeachingRepository extends CrudRepository<TeachingEntity, Integer> {
@@ -46,5 +47,7 @@ public interface TeachingRepository extends CrudRepository<TeachingEntity, Integ
 
 	TeachingEntity findByTeacherSubjectSubjectAndTeacherSubjectTeacherAndTeachToClass(SubjectEntity sub,
 			TeacherEntity logTeacher, ClassEntity clazz);
+
+	boolean existsByTeacherSubjectAndTeachToClass(TeacherSubjectEntity tsAdd, ClassEntity classToAdd);
 
 }

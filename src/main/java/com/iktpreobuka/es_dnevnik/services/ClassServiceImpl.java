@@ -13,6 +13,7 @@ import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeacherSubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.TeacherSubjectClassDTO;
+import com.iktpreobuka.es_dnevnik.exceptions.ObjectAlreadyExistsException;
 import com.iktpreobuka.es_dnevnik.exceptions.ResourceNotFoundException;
 import com.iktpreobuka.es_dnevnik.repositories.ClassRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
@@ -43,6 +44,7 @@ public class ClassServiceImpl implements ClassService {
 
 	@Autowired
 	private StudentRepository studentRepository;
+	
 
 	@Override
 	public TeachingEntity addTeachingToClass(TeacherSubjectClassDTO newSubjectTeacherToClass) {
@@ -78,11 +80,16 @@ public class ClassServiceImpl implements ClassService {
 
 		ClassEntity classToAdd = classRepository.findByClassInGradeGradeAndSign(newSubjectTeacherToClass.getGrade(),
 				newSubjectTeacherToClass.getSign());
-
+		
 		TeachingEntity teachingToClass = new TeachingEntity();
 		teachingToClass.setTeacherSubject(tsAdd);
 		teachingToClass.setTeachToClass(classToAdd);
-
+		
+		if(teachingRepository.existsByTeacherSubjectAndTeachToClass(tsAdd,classToAdd)) {
+			logger.info("Admin try to add subject-teacher to class wich exists.");
+			throw new ObjectAlreadyExistsException("That subject-teacher exists in this class.");
+		}
+		logger.info("That subject-teacher added to class.");
 		teachingRepository.save(teachingToClass);
 		return teachingToClass;
 
@@ -104,13 +111,13 @@ public class ClassServiceImpl implements ClassService {
 		}
 		String message;
 		StudentEntity student = studentRepository.findByUserName(studentUserName);
-		if ((student.getClassLevel().getClassInGrade().getGrade() != null)
-				&& (student.getClassLevel().getSign() != null))
-			message = "Student " + studentUserName + " was on grade with sign "
-					+ student.getClassLevel().getClassInGrade().getGrade() + "/" + student.getClassLevel().getSign()
-					+ ", now is on grade with sign " + grade + "/" + sign;
-
-		else
+//		if ((student.getClassLevel().getClassInGrade().getGrade() != null)
+//				&& (student.getClassLevel().getSign() != null))
+//			message = "Student " + studentUserName + " was on grade with sign "
+//					+ student.getClassLevel().getClassInGrade().getGrade() + "/" + student.getClassLevel().getSign()
+//					+ ", now is on grade with sign " + grade + "/" + sign;
+//
+//		else
 			message = "Student " + studentUserName + " is added in grade with sign " + grade + "/" + sign;
 		student.setClassLevel(clazz);
 		logger.info(message);
