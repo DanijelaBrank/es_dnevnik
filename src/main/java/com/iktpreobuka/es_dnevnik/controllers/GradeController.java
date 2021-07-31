@@ -1,10 +1,13 @@
 package com.iktpreobuka.es_dnevnik.controllers;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +24,19 @@ import com.iktpreobuka.es_dnevnik.entities.GradeEntity;
 import com.iktpreobuka.es_dnevnik.entities.SubjectInGradeEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.GradeDTO;
 import com.iktpreobuka.es_dnevnik.entities.dto.SubjectInGradeDTO;
+import com.iktpreobuka.es_dnevnik.exceptions.ResourceNotFoundException;
+import com.iktpreobuka.es_dnevnik.repositories.GradeRepository;
 import com.iktpreobuka.es_dnevnik.services.GradeService;
 
 @RestController
 public class GradeController {
+	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private GradeService gradeService;
+	@Autowired
+	private GradeRepository gradeRepository;
 	
 //	@Autowired
 //	private GradeRepository gradeRepository;
@@ -37,9 +46,13 @@ public class GradeController {
 	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST, path = "/addGrade")
-	public ResponseEntity<?> addGrade(@Valid @RequestBody GradeDTO newGrade, BindingResult result) {
+	public ResponseEntity<?> addGrade(@Valid @RequestBody GradeDTO newGrade, BindingResult result) throws SQLIntegrityConstraintViolationException {
 		if (result.hasErrors())
 			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
+		
+		if(gradeRepository.existsByGrade(newGrade.getGrade())) {
+		logger.info("Grade="+newGrade.getGrade()+" already exists!");
+			throw new SQLIntegrityConstraintViolationException("Grade="+newGrade.getGrade()+" already exists!");}
 		return new ResponseEntity<>(gradeService.addGrade(newGrade), HttpStatus.OK);
 	}
 	

@@ -11,15 +11,11 @@ public class ClassDTO {
 	
 	@NotNull(message = "Grade must be provided.")
 	@Range(min = 1,max=8, message = "Grade must be between 1 - 8")
-//	@Min(value = 1, message = "Grade must be between 1 - 8")
-//	@Max(value = 8, message = "Grade must be between 1 - 8")
 	@Column(nullable = false)
 	private Integer grade;
 	
 	@NotNull(message = "Sign of class must be provided.")
 	@Range(min = 1,max=10, message = "Sign of class must be between 1 - 10")
-//	@Min(value = 1, message = "Sign of class must be between 1 - 10")
-//	@Max(value = 10, message = "Sign of class must be between 1 - 10")
 	@Column(nullable = false)
 	private Integer sign;
 

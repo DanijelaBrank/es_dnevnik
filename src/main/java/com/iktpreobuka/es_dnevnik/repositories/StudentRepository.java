@@ -8,5 +8,7 @@ public interface StudentRepository extends CrudRepository<StudentEntity, Integer
 
 	Boolean existsByUserName(String studentUserName);
 	StudentEntity findByUserName(String studentUserName);
+	boolean existsByUserNameAndParentId(String studentUserName, Integer id);
+	StudentEntity findByUserNameAndParentId(String studentUserName, Integer id);
 
 }

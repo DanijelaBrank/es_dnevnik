@@ -1,4 +1,4 @@
-package com.iktpreobuka.es_dnevnik.entities;
+ package com.iktpreobuka.es_dnevnik.entities;
 
 import java.time.LocalDate;
 
@@ -24,8 +24,10 @@ public class MarkEntity {
 	@Column(name = "mark_id")
 	private Integer id;
 	
+	// **** vrednost za ocenu od 1-5 je ogranicena u MarkDTO ****
 	private Integer mark;
 	
+	// **** vrednost za semestar od 1 ili 2 je ogranicena u metodi za unos semestra ****
 	private Integer semester;
 	
 	private LocalDate date;
@@ -100,4 +102,18 @@ public class MarkEntity {
 	public void setGrader(TeachingEntity grader) {
 		this.grader = grader;
 	}
+	
+	@Override
+	public String toString() {
+		return "MarkEntity [id=" + id + ", mark=" + mark + ", semester=" + semester + ", date=" + date
+				+ ", description=" + description + ", grader=" + grader + "]";
+	}
+	
+	
+	public String toStudentString() {
+		return "MarkEntity [id=" + id + ", mark=" + mark + ", semester=" + semester + ", date=" + date
+				+ ", description=" + description +", in subject=" + grader.getTeacherSubject().getSubject().getName() + ",by teacher=" + grader.getTeacherSubject().getTeacher().getUserName() + "]";
+	}
+
+	
 }

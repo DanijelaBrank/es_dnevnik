@@ -3,20 +3,22 @@ package com.iktpreobuka.es_dnevnik.entities.dto;
 import javax.persistence.Column;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Range;
 
 import com.iktpreobuka.es_dnevnik.entities.EClassGroup;
 
 public class GradeDTO {
 	
 	@NotNull(message = "Grade must be provided.")
-	@Min(value = 1, message = "Grade must be between 1 - 8")
-	@Max(value = 8, message = "Grade must be between 1 - 8")
+	@Range(min = 1, max = 8, message = "Grade must be between 1 - 8")
 	@Column(nullable = false, unique = true)
 	private Integer grade;
 
-//	@NotBlank(message = "Class group must have value JUNIOR_CLASS or SENIOR_CLASS")
-	@Column(nullable = false)
+	@NotNull(message = "ClassGroup must be provided.")
+	@Column(nullable = true)
 	private EClassGroup classGroup;
 
 	public GradeDTO() {

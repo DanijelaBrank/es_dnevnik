@@ -13,4 +13,6 @@ public interface TeacherSubjectRepository extends CrudRepository<TeacherSubjectE
 	boolean existsByTeacherUserNameAndSubjectNameAndSubjectClassGroup(String userName, String subject,
 			EClassGroup classGroup);
 
+	boolean existsBySubjectNameAndTeacherUserName(String subject, String userName);
+
 }

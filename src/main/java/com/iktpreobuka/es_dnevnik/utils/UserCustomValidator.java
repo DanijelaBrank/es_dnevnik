@@ -7,6 +7,7 @@ import org.springframework.validation.Validator;
 
 import com.iktpreobuka.es_dnevnik.entities.UserEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.UserDTO;
+import com.iktpreobuka.es_dnevnik.exceptions.ResourceNotFoundException;
 import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
 
 @Component
@@ -24,6 +25,9 @@ public class UserCustomValidator implements Validator {
 	@Override
 	public void validate(Object target, Errors errors) {
 		UserDTO user=(UserDTO)target;
+		if(user.getPassword()==null)
+			throw new NullPointerException("Password must be provided.");
+		
 		if(!user.getPassword().equals(user.getPasswordConfirm())) {
 			errors.reject("400", "Password must match");
 		}

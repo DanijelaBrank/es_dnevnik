@@ -1,6 +1,7 @@
 package com.iktpreobuka.es_dnevnik.controllers;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -13,152 +14,264 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iktpreobuka.es_dnevnik.entities.MarkEntity;
+import com.iktpreobuka.es_dnevnik.entities.ParentEntity;
+import com.iktpreobuka.es_dnevnik.entities.StudentEntity;
 import com.iktpreobuka.es_dnevnik.entities.SubjectEntity;
 import com.iktpreobuka.es_dnevnik.entities.TeacherEntity;
+import com.iktpreobuka.es_dnevnik.entities.TeachingEntity;
 import com.iktpreobuka.es_dnevnik.entities.UserEntity;
 import com.iktpreobuka.es_dnevnik.entities.dto.MarkDTO;
+import com.iktpreobuka.es_dnevnik.exceptions.ResourceNotFoundException;
 import com.iktpreobuka.es_dnevnik.repositories.MarkRepository;
+import com.iktpreobuka.es_dnevnik.repositories.ParentRepository;
 import com.iktpreobuka.es_dnevnik.repositories.StudentRepository;
-import com.iktpreobuka.es_dnevnik.repositories.SubjectRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeacherRepository;
 import com.iktpreobuka.es_dnevnik.repositories.TeachingRepository;
 import com.iktpreobuka.es_dnevnik.repositories.UserRepository;
-import com.iktpreobuka.es_dnevnik.services.ClassService;
+import com.iktpreobuka.es_dnevnik.services.MarkService;
 import com.iktpreobuka.es_dnevnik.services.UserService;
 
 @RestController
 public class MarkController {
-	
-	private final Logger logger=LoggerFactory.getLogger(this.getClass());
-	
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	@Autowired
+	private MarkService markService;
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private StudentRepository studentRepository;
+	@Autowired
+	private ParentRepository parentRepository;
 	@Autowired
 	private TeacherRepository teacherRepository;
 	@Autowired
-	private StudentRepository studentRepository;
-	
+	private MarkRepository markRepository;
+	@Autowired
+	private UserRepository userRepository;
 	@Autowired
 	private TeachingRepository teachingRepository;
-	
-	@Autowired
-	private MarkRepository markRepository;
-	
-	@Autowired
-	private SubjectRepository subjectRepository;
-	
-	@Autowired
-	private UserService userService;
-	
-//  ******* OCENJIVANJE UCENIKA  *******
-	
+
+
+//  ******* OCENJIVANJE UCENIKA OD STRANE PROFESORA *******
+
 	@Secured("ROLE_TEACHER")
 	@RequestMapping(method = RequestMethod.POST, path = "/addMark")
 	public ResponseEntity<?> addMarkToStudent(@Valid @RequestBody MarkDTO newMark, BindingResult result) {
-		if (result.hasErrors()) 
-			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST); 
-	
-		TeacherEntity logTeacher=teacherRepository.findByUserName(userService.getLoggedUser());
-		SubjectEntity sub=subjectRepository.findByNameAndClassGroup(newMark.getSubject(),logTeacher.getClassGroup());
+		if (result.hasErrors())
+			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 
-		if (!studentRepository.existsByUserName(newMark.getStudentUserName())) {
-			logger.info("Student doesn't exists!");
-			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);}
-		if(!teachingRepository.existsByTeacherSubjectSubjectAndTeacherSubjectTeacher(sub,logTeacher)) {
-			logger.info("Student doesn't attend that subject!");
-		
-			return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);}
-		
-	//	if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()))
-	//		return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);.
-	
-		//	if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectSubjectClassGroupAndTeacherSubjectTeacherUserName(newMark.getSubject(),0,userService.getLoggedUser()))
-	//		return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
-		
-
-		MarkEntity mark=new MarkEntity();
-				mark.setStudent(studentRepository.findByUserName(newMark.getStudentUserName()));
-				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectAndTeacherSubjectTeacher(sub,logTeacher));
-				mark.setMark(newMark.getMark());
-				mark.setDescription(newMark.getDescription());
-				if(newMark.getDate()!=null)
-					mark.setDate(newMark.getDate());
-					else
-						mark.setDate(LocalDate.now());
-				mark.setSemester(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()).getTeachToClass().getClassInGrade().getSemester());
-				markRepository.save(mark);	
-				logger.info("Mark added!");
+		MarkEntity mark = markService.addMark(newMark);
 		return new ResponseEntity<>(mark, HttpStatus.OK);
 	}
-	
-//	@Secured("ROLE_TEACHER")
-//	@RequestMapping(method = RequestMethod.POST, path = "/addMark")
-//	public ResponseEntity<?> addMarkToStudent(@Valid @RequestBody MarkDTO newMark, BindingResult result) {
-//		if (result.hasErrors()) 
-//			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST); 
-//	//UserEntity
-//
-//		if (!studentRepository.existsByUserName(newMark.getStudentUserName()))
-//			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);
-//		
-//		if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()))
-//			return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
-//	
-//		//	if(!teachingRepository.existsByTeacherSubjectSubjectNameAndTeacherSubjectSubjectClassGroupAndTeacherSubjectTeacherUserName(newMark.getSubject(),0,userService.getLoggedUser()))
-//	//		return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
-//		
-//
-//		MarkEntity mark=new MarkEntity();
-//				mark.setStudent(studentRepository.findByUserName(newMark.getStudentUserName()));
-//				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectNameAndTeacherSubjectTeacherUserName(newMark.getSubject(), userService.getLoggedUser()));
-//				mark.setMark(newMark.getMark());
-//				mark.setDescription(newMark.getDescription());
-//				if(newMark.getDate()!=null)
-//					mark.setDate(newMark.getDate());
-//					else
-//						mark.setDate(LocalDate.now());
-//				mark.setSemester(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()).getTeachToClass().getClassInGrade().getSemester());
-//				markRepository.save(mark);		
-//		return new ResponseEntity<>(mark, HttpStatus.OK);
-//	}
+
 //  ******* DAVANJE OCENA UCENIKU OD STRANE ADMINISTRATORA *******
-	
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST, path = "/addMarkByAdmin")
 	public ResponseEntity<?> addMarkByAdmin(@Valid @RequestBody MarkDTO newMark, BindingResult result) {
-		if (result.hasErrors()) 
-			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST); 
+		if (result.hasErrors())
+			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
 
-		if (!studentRepository.existsByUserName(newMark.getStudentUserName()))
-			return new ResponseEntity<>("Student doesn't exists", HttpStatus.BAD_REQUEST);
-		
-		if(!teachingRepository.existsByTeacherSubjectSubjectName(newMark.getSubject()))
-			return new ResponseEntity<>("Student doesn't attend that subject", HttpStatus.BAD_REQUEST);
-		
-		MarkEntity mark=new MarkEntity();
-				mark.setStudent(studentRepository.findByUserName(newMark.getStudentUserName()));
-				mark.setGrader(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()));
-				mark.setMark(newMark.getMark());
-				mark.setDescription("Correction By Admin");
-				if(newMark.getDate()!=null)
-					mark.setDate(newMark.getDate());
-					else
-						mark.setDate(LocalDate.now());
-				mark.setSemester(teachingRepository.findByTeacherSubjectSubjectName(newMark.getSubject()).getTeachToClass().getClassInGrade().getSemester());
-				markRepository.save(mark);		
+		MarkEntity mark = markService.addMarkByAdmin(newMark);
 		return new ResponseEntity<>(mark, HttpStatus.OK);
 	}
-	
-	
-	
 
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
 
 	}
+	
+//  ******* ZAKLJUCNA OCENA UCENIKU OD STRANE PROFESORA *******
 
+	@Secured("ROLE_TEACHER")
+	@RequestMapping(method = RequestMethod.POST, path = "/addFinalMark/{studentName}/{subject}")
+	public ResponseEntity<?> addFinalMarkToStudent(@PathVariable String studentName,@PathVariable String subject) {
+		
+		MarkEntity mark = markService.addFinalMark(studentName,subject);
+		return new ResponseEntity<>(mark, HttpStatus.OK);
+	}
+
+//  ******* PRETRAGA OCENA OD STRANE UCENIKA *******
+
+	@Secured("ROLE_STUDENT")
+	@RequestMapping(method = RequestMethod.GET, path = "/findMarkByStudent")
+	public List<String> findMarkByStudent() {
+		StudentEntity logStudent = studentRepository.findByUserName(userService.getLoggedUser());
+		List<String> marksSt = new ArrayList<String>();
+		marksSt = markService.findStudentMark(logStudent);
+		logger.info("Student " + logStudent.getUserName() + " looked at his grades!");
+		return marksSt;
+	}
+
+	@Secured("ROLE_STUDENT")
+	@RequestMapping(method = RequestMethod.GET, path = "/findStudentMarkBySubject/{subjectName}")
+	public List<String> findStudentMarkBySubject(@PathVariable String subjectName) {
+		StudentEntity logStudent = studentRepository.findByUserName(userService.getLoggedUser());
+		List<String> marksSt = new ArrayList<String>();
+		marksSt = markService.findStudentMark(logStudent, subjectName);
+		logger.info("Student " + logStudent.getUserName() + " looked at his grades from subject " + subjectName + ".");
+		return marksSt;
+	}
+
+//  ******* PRETRAGA OCENA OD STRANE RODITELJA *******
+
+	@Secured("ROLE_PARENT")
+	@RequestMapping(method = RequestMethod.GET, path = "/getMarkByParent/{studentUserName}")
+	public List<String> getMarkByParent(@PathVariable String studentUserName) {
+
+		ParentEntity logParent = parentRepository.findByUserName(userService.getLoggedUser());
+		if (!studentRepository.existsByUserNameAndParentId(studentUserName, logParent.getId())) {
+
+			logger.info("Parent " + logParent.getUserName() + " tried to look at the grades for child "
+					+ studentUserName + " for which he has no access. ");
+			throw new ResourceNotFoundException("You don't have a child with a userName " + studentUserName);
+		}
+		StudentEntity student = studentRepository.findByUserNameAndParentId(studentUserName, logParent.getId());
+		List<String> marksSt = new ArrayList<String>();
+		marksSt = markService.findStudentMark(student);
+		logger.info("Parent " + logParent.getUserName() + " looked at the grades for child " + studentUserName + "!");
+		return marksSt;
+	}
+
+	@Secured("ROLE_PARENT")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectMarkByParent/{studentUserName}/{subjectName}")
+	public List<String> getSubjectMarkByParent(@PathVariable String studentUserName, @PathVariable String subjectName) {
+
+		ParentEntity logParent = parentRepository.findByUserName(userService.getLoggedUser());
+		if (!studentRepository.existsByUserNameAndParentId(studentUserName, logParent.getId())) {
+			logger.info("Parent " + logParent.getUserName() + " tried to look at the grades for child "
+					+ studentUserName + " for which he has no access. ");
+			throw new ResourceNotFoundException("You don't have a child with a userName " + studentUserName);
+		}
+		StudentEntity student = studentRepository.findByUserNameAndParentId(studentUserName, logParent.getId());
+		List<String> marksSt = new ArrayList<String>();
+		marksSt = markService.findStudentMark(student, subjectName);
+		logger.info("Parent " + logParent.getUserName() + " looked at the grades for child " + studentUserName
+				+ " from subject " + subjectName + ".");
+		return marksSt;
+	}
+	
+//  ******* PRETRAGA OCENA OD STRANE PROFESORA *******
+
+	@Secured("ROLE_TEACHER")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectMarkByTeacher/{studentUserName}/{subjectName}")
+	public List<String> getSubjectMarkByTeacher(@PathVariable String studentUserName, @PathVariable String subjectName) {
+
+		TeachingEntity grader=markService.logTeacherTeachingSubjectToStudent(studentUserName, subjectName);
+		List<MarkEntity> marks=markRepository.findByStudentUserNameAndGrader(studentUserName,grader);
+		List<String> marksToStudent=new  ArrayList<String>();
+		for(MarkEntity mark:marks) {
+			String markToStudent=mark.toStudentString();
+			marksToStudent.add(markToStudent);
+		}	
+		logger.info("Profesor " + userService.getLoggedUser() + " looked at the grades for student " + studentUserName
+				+ " from subject " + subjectName + ".");
+		return marksToStudent;
+				
+	}	
+	
+	@Secured("ROLE_TEACHER")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectInClassMarkByTeacher/{subjectName}/{grade}/{sign}")
+	public List<String> getSubjectMarkInClassByTeacher( @PathVariable String subjectName,@PathVariable Integer grade,@PathVariable Integer sign) {
+
+		TeachingEntity grader=markService.logTeacherTeachingSubjectToClass(subjectName, grade, sign);
+		List<MarkEntity> marks=markRepository.findByGrader(grader);
+		List<String> marksToClass=new  ArrayList<String>();
+		for(MarkEntity mark:marks) {
+			String markToStudent=mark.toStudentString();
+			marksToClass.add(markToStudent);
+		}	
+		logger.info("Profesor " + userService.getLoggedUser() + " looked at the grades for class " + grade+"/"+sign
+				+ " from subject " + subjectName + ".");
+		return marksToClass;
+					
+	}	
+	
+	
+//  ******* PRETRAGA OCENA OD STRANE ADMINA *******
+
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.GET, path = "/getStudentMarkByAdmin/{studentUserName}")
+	public List<String> getStudentMarkByAdmin(@PathVariable String studentUserName) {
+
+		UserEntity logAdmin = userRepository.findByUserName(userService.getLoggedUser());
+		if (!studentRepository.existsByUserName(studentUserName )) {
+			logger.info("Student "+ studentUserName + " doesn't exists. ");
+			throw new ResourceNotFoundException("Student "+ studentUserName + " doesn't exists. ");
+		}
+		StudentEntity student = studentRepository.findByUserName(studentUserName);
+		List<String> marksSt = new ArrayList<String>();
+		marksSt = markService.findStudentMark(student);
+		logger.info("Admin " + logAdmin.getUserName() + " looked at the grades for student " + studentUserName + "!");
+		return marksSt;
+	}
+
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectMarkByAdmin/{studentUserName}/{subjectName}")
+	public List<String> getSubjectMarkByAdmin(@PathVariable String studentUserName, @PathVariable String subjectName) {
+
+		UserEntity logAdmin = userRepository.findByUserName(userService.getLoggedUser());
+		if (!studentRepository.existsByUserName(studentUserName )) {
+			logger.info("Student "+ studentUserName + " doesn't exists. ");
+			throw new ResourceNotFoundException("Student "+ studentUserName + " doesn't exists. ");
+		}
+		StudentEntity student = studentRepository.findByUserName(studentUserName);
+		List<String> marksSt = new ArrayList<String>();
+		marksSt = markService.findStudentMark(student, subjectName);
+		logger.info("Admin " + logAdmin.getUserName() + " looked at the grades for student " + studentUserName
+				+ " from subject " + subjectName + ".");
+		return marksSt;
+	}
+	
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.GET, path = "/getSubjectInClassMarkByAdmin/{subjectName}/{grade}/{sign}")
+	public List<String> getSubjectMarkInClassByAdmin( @PathVariable String subjectName,@PathVariable Integer grade,@PathVariable Integer sign) {
+
+		//UserEntity logAdmin = userRepository.findByUserName(userService.getLoggedUser());
+		
+		TeachingEntity grader=teachingRepository.findByTeacherSubjectSubjectNameAndTeachToClassClassInGradeGradeAndTeachToClassSign(subjectName,grade,sign);
+				//markService.logTeacherTeachingSubjectToClass(subjectName, grade, sign);
+		List<MarkEntity> marks=markRepository.findByGrader(grader);
+		List<String> marksToClass=new  ArrayList<String>();
+		for(MarkEntity mark:marks) {
+			String markToStudent=mark.toStudentString();
+			marksToClass.add(markToStudent);
+		}	
+		logger.info("Admin " + userService.getLoggedUser() + " looked marks at the grades for class " + grade+"/"+sign
+				+ " from subject " + subjectName + ".");
+		return marksToClass;
+					
+	}	
+	
+	
+//  ******* BRISANJE OCENA OD STRANE ADMINA *******
+	
+	@Secured("ROLE_ADMIN")
+	@RequestMapping(method = RequestMethod.DELETE, value = "deleteMark/{id}")
+	public MarkEntity deleteMark(@PathVariable Integer id) {
+		if (!markRepository.existsById(id)) 			
+			return null;
+		MarkEntity mark = markRepository.findById(id).get();
+		markRepository.delete(mark);
+		logger.info("Mark with ID= " + mark.getId() + " deleted by admin."); 
+		return mark;
+	}
+	
+
+				
+		
+
+		
+		
+		
+		
 }

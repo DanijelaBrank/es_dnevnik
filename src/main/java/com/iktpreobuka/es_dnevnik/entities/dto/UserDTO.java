@@ -32,11 +32,12 @@ public class UserDTO {
 
 	@NotBlank(message = "Password must be not blank or null.")
 	@Size(min = 5, max = 10, message = "Password must be between {min} and {max} characters long.")
-	//@JsonIgnore
+	@Column(nullable = false)
 	private String password;
 	
 	@NotBlank(message = "Password must be not blank or null.")
 	@Size(min = 5, max = 10, message = "Password must be between {min} and {max} characters long.")
+	@Column(nullable = false)
 	private String passwordConfirm;
 	
 	@Null
